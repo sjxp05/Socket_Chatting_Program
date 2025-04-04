@@ -77,6 +77,21 @@ public class Client extends JFrame {
         }
     }
 
+    class syncOnUpdate implements Runnable {
+        synchronized void start() {
+
+        }
+
+        synchronized void waitForStart() {
+
+        }
+
+        @Override
+        public void run() {
+
+        }
+    }
+
     void updatePanel() {
         String sendTxt = textField.getText().strip();
         textField.setText("");
