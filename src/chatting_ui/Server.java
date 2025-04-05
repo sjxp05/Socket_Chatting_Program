@@ -2,15 +2,18 @@ package chatting_ui;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class Server {
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(12345)) {
             System.out.println("서버를 시작합니다.");
 
-            while (true) {
+            while (true) { // 수정필요
+                ArrayList<Socket> clientList = new ArrayList<>();
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("클라이언트와 연결되었습니다.");
+                clientList.add(clientSocket);
+                System.out.println(clientList.size() + "번째 클라이언트와 연결되었습니다.");
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
