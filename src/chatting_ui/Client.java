@@ -156,7 +156,7 @@ public class Client extends JFrame {
         });
     }
 
-    synchronized void readMessage(String input) { // 수정 필요 ?
+    synchronized void readMessage(String input) {
         String sendName = input.substring(0, input.indexOf(':'));
         String sendTxt = input.substring(input.indexOf(':') + 1);
 
