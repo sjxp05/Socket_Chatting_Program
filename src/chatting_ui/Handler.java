@@ -2,7 +2,6 @@ package chatting_ui;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 public class Handler {
     private Socket socket;
