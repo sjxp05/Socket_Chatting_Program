@@ -162,7 +162,10 @@ public class Client extends JFrame {
                 noticeLb.setFont(new Font("Sans Serif", Font.PLAIN, 13));
                 noticeLb.setForeground(Color.GRAY);
                 msgPanel.add(noticeLb);
+
+                lastSpeaker = "";
                 nextMsgLocation += 25;
+
             } else {
                 return;
             }
@@ -179,19 +182,19 @@ public class Client extends JFrame {
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.RIGHT);
                     nameLb.setBounds(0, nextMsgLocation, 340, 20);
-                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
                     lastSpeaker = sendName;
-                    nextMsgLocation += 20;
+                    nextMsgLocation += 22;
                 }
 
                 msgLb.setHorizontalAlignment(JLabel.RIGHT);
                 msgLb.setBounds(0, nextMsgLocation, 340, 20);
                 msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 msgPanel.add(msgLb);
-                nextMsgLocation += 30;
+                nextMsgLocation += 32;
 
             } else {
                 if (sendName.equals(lastSpeaker)) {
@@ -199,19 +202,19 @@ public class Client extends JFrame {
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.LEFT);
                     nameLb.setBounds(10, nextMsgLocation, 340, 20);
-                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
                     lastSpeaker = sendName;
-                    nextMsgLocation += 20;
+                    nextMsgLocation += 22;
                 }
 
                 msgLb.setHorizontalAlignment(JLabel.LEFT);
                 msgLb.setBounds(10, nextMsgLocation, 340, 20);
                 msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 msgPanel.add(msgLb);
-                nextMsgLocation += 30;
+                nextMsgLocation += 32;
             }
         }
 
