@@ -11,7 +11,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
-public class Client extends JFrame {
+public class Client2 extends JFrame {
     JTextField textField = new JTextField();
     JButton sendBt = new JButton("전송");
     JPanel msgPanel = new JPanel();
@@ -23,10 +23,10 @@ public class Client extends JFrame {
     private static BufferedReader reader;
     private static PrintWriter writer;
 
-    String userName = "Client1";
+    String userName = "Client2";
     private int nextMsgLocation = 10;
 
-    public Client() {
+    public Client2() {
         setTitle("New Chat");
         setSize(400, 600);
         setResizable(false);
@@ -200,11 +200,11 @@ public class Client extends JFrame {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
 
-            Client client = new Client();
-            writer.println(client.userName);
+            Client2 client2 = new Client2();
+            writer.println(client2.userName);
 
             while (reader != null) {
-                client.readMessage();
+                client2.readMessage();
             }
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());
