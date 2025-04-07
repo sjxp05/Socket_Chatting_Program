@@ -20,7 +20,7 @@ public class Handler {
         }
     }
 
-    static void broadcast() {
+    static synchronized void broadcast() {
 
     }
 }
