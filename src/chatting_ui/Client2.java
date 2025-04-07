@@ -12,10 +12,12 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 public class Client2 extends JFrame {
-    JTextField textField = new JTextField();
-    JButton sendBt = new JButton("전송");
+    JLabel roomName = new JLabel("새로운 채팅방");
     JPanel msgPanel = new JPanel();
     JScrollPane scroll = new JScrollPane(msgPanel);
+    JTextField textField = new JTextField();
+    JButton sendBt = new JButton("전송");
+    JButton exitBt = new JButton("나가기");
 
     private SyncOnUpdate sync = new SyncOnUpdate();
 
@@ -24,6 +26,7 @@ public class Client2 extends JFrame {
     private static PrintWriter writer;
 
     String userName = "Client2";
+    String lastSpeaker = "";
     private int nextMsgLocation = 10;
 
     public Client2() {
@@ -36,20 +39,35 @@ public class Client2 extends JFrame {
         Container pane = getContentPane();
         pane.setLayout(null);
 
+        roomName.setFont(new Font("Sans Serif", Font.BOLD, 15));
+        roomName.setHorizontalAlignment(JLabel.CENTER);
+        roomName.setBounds(100, 5, 200, 40);
+        pane.add(roomName);
+
+        exitBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
+        exitBt.setBounds(10, 5, 70, 40);
+        exitBt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        pane.add(exitBt);
+
+        msgPanel.setBounds(0, 0, 350, 435);
+        msgPanel.setLayout(null);
+
+        scroll.setBounds(10, 50, 368, 435);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        pane.add(scroll);
+
         textField.setFont(new Font("Sans Serif", Font.PLAIN, 15));
         textField.setBounds(10, 500, 290, 50);
         textField.requestFocus();
         textField.addKeyListener(new PressEnter());
         pane.add(textField);
 
-        msgPanel.setBounds(0, 0, 350, 480);
-        msgPanel.setLayout(null);
-
-        scroll.setBounds(10, 10, 368, 480);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        pane.add(scroll);
-
-        sendBt.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        sendBt.setFont(new Font("Sans Serif", Font.BOLD, 15));
         sendBt.setBounds(310, 500, 70, 50);
         sendBt.addActionListener(new ActionListener() {
             @Override
@@ -119,6 +137,8 @@ public class Client2 extends JFrame {
     void sendMessage() {
         String msg = textField.getText().strip();
         textField.setText("");
+        textField.requestFocus();
+
         if (msg.length() == 0) {
             return;
         }
@@ -154,25 +174,38 @@ public class Client2 extends JFrame {
             JLabel msgLb = new JLabel(sendTxt);
 
             if (sendName.equals(userName)) {
-                nameLb.setHorizontalAlignment(JLabel.RIGHT);
-                nameLb.setBounds(0, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-                nextMsgLocation += 20;
+                if (sendName.equals(lastSpeaker)) {
+                    nextMsgLocation -= 10;
+                } else {
+                    nameLb.setHorizontalAlignment(JLabel.RIGHT);
+                    nameLb.setBounds(0, nextMsgLocation, 340, 20);
+                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+                    nameLb.setForeground(Color.GRAY);
+                    msgPanel.add(nameLb);
+
+                    lastSpeaker = sendName;
+                    nextMsgLocation += 20;
+                }
 
                 msgLb.setHorizontalAlignment(JLabel.RIGHT);
                 msgLb.setBounds(0, nextMsgLocation, 340, 20);
                 msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 msgPanel.add(msgLb);
                 nextMsgLocation += 30;
+
             } else {
-                nameLb.setHorizontalAlignment(JLabel.LEFT);
-                nameLb.setBounds(10, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-                nextMsgLocation += 20;
+                if (sendName.equals(lastSpeaker)) {
+                    nextMsgLocation -= 10;
+                } else {
+                    nameLb.setHorizontalAlignment(JLabel.LEFT);
+                    nameLb.setBounds(10, nextMsgLocation, 340, 20);
+                    nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+                    nameLb.setForeground(Color.GRAY);
+                    msgPanel.add(nameLb);
+
+                    lastSpeaker = sendName;
+                    nextMsgLocation += 20;
+                }
 
                 msgLb.setHorizontalAlignment(JLabel.LEFT);
                 msgLb.setBounds(10, nextMsgLocation, 340, 20);
@@ -182,7 +215,7 @@ public class Client2 extends JFrame {
             }
         }
 
-        if (nextMsgLocation >= 450) {
+        if (nextMsgLocation >= 405) {
             // 패널 크기 갱신
             msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
             msgPanel.revalidate();
@@ -200,11 +233,11 @@ public class Client2 extends JFrame {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
 
-            Client2 client2 = new Client2();
-            writer.println(client2.userName);
+            Client2 client = new Client2();
+            writer.println(client.userName);
 
             while (reader != null) {
-                client2.readMessage();
+                client.readMessage();
             }
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());

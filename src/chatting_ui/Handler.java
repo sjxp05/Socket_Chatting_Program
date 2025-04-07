@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Handler extends Thread {
     static ArrayList<PrintWriter> writerList = new ArrayList<>();
 
-    Socket socket;
+    private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     String userName;
@@ -27,7 +27,7 @@ public class Handler extends Thread {
     public void run() {
         try {
             this.userName = in.readLine();
-            System.out.println("[" + userName + " 새연결생성]");
+            System.out.println("[" + userName + " 연결됨]");
             sendAll(userName + " 님이 참여했습니다.");
 
             while (in != null) {
@@ -35,7 +35,7 @@ public class Handler extends Thread {
                 sendAll(inputMsg);
             }
         } catch (IOException e) {
-            System.out.println("[" + userName + " 접속끊김]");
+            System.out.println("[" + userName + " 접속 끊김]");
 
         } finally {
             sendAll(userName + " 님이 나갔습니다.");

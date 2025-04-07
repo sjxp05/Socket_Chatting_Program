@@ -11,7 +11,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
-public class Client extends JFrame {
+public class Client3 extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방");
     JPanel msgPanel = new JPanel();
     JScrollPane scroll = new JScrollPane(msgPanel);
@@ -25,11 +25,11 @@ public class Client extends JFrame {
     private static BufferedReader reader;
     private static PrintWriter writer;
 
-    String userName = "Client1";
+    String userName = "Client3";
     String lastSpeaker = "";
     private int nextMsgLocation = 10;
 
-    public Client() {
+    public Client3() {
         setTitle("New Chat");
         setSize(400, 600);
         setResizable(false);
@@ -233,7 +233,7 @@ public class Client extends JFrame {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream(), true);
 
-            Client client = new Client();
+            Client3 client = new Client3();
             writer.println(client.userName);
 
             while (reader != null) {
