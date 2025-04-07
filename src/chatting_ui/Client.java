@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.*;
 
@@ -18,6 +20,8 @@ public class Client extends JFrame {
     JScrollPane scroll = new JScrollPane(msgPanel);
 
     private SyncOnUpdate sync = new SyncOnUpdate();
+    private WhenEnter whenEnter = new WhenEnter();
+    private WhenExit whenExit = new WhenExit();
 
     private static Socket socket = null;
     private static BufferedReader reader;
@@ -59,6 +63,38 @@ public class Client extends JFrame {
         });
         pane.add(sendBt);
 
+        addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                whenEnter.start();
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                whenExit.start();
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+        });
+
         setVisible(true);
     }
 
@@ -76,6 +112,91 @@ public class Client extends JFrame {
 
         @Override
         public void keyReleased(KeyEvent e) {
+        }
+    }
+
+    class WhenEnter implements Runnable {
+        boolean flag = false;
+
+        WhenEnter() {
+            Thread thread = new Thread(this);
+            thread.start();
+        }
+
+        synchronized void start() {
+            flag = true;
+            this.notify();
+        }
+
+        synchronized void waitForStart() {
+            if (!flag) {
+                try {
+                    this.wait();
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                waitForStart();
+                try {
+                    sendNotice(" 이 들어왔습니다.");
+                    flag = false;
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    class WhenExit implements Runnable {
+        boolean flag = false;
+
+        WhenExit() {
+            Thread thread = new Thread(this);
+            thread.start();
+        }
+
+        synchronized void start() {
+            flag = true;
+            this.notify();
+        }
+
+        synchronized void waitForStart() {
+            if (!flag) {
+                try {
+                    this.wait();
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                waitForStart();
+                try {
+                    sendNotice(" 이 나갔습니다.");
+                    flag = false;
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    void sendNotice(String status) {
+        writer.println(userName + status);
+
+        try {
+            String input = reader.readLine();
+            readMessage(input);
+        } catch (Exception e) {
+            System.out.println("오류 발생: " + e.getMessage());
         }
     }
 
@@ -157,28 +278,40 @@ public class Client extends JFrame {
     }
 
     synchronized void readMessage(String input) {
-        String sendName = input.substring(0, input.indexOf(':'));
-        String sendTxt = input.substring(input.indexOf(':') + 1);
+        if (input.indexOf(':') == -1) {
+            JLabel noticeLb = new JLabel(input);
 
-        if (sendName.equals(userName)) {
-            return;
+            noticeLb.setHorizontalAlignment(JLabel.CENTER);
+            noticeLb.setBounds(10, nextMsgLocation, 340, 20);
+            noticeLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+            noticeLb.setForeground(Color.GRAY);
+            msgPanel.add(noticeLb);
+            nextMsgLocation += 20;
+
+        } else {
+            String sendName = input.substring(0, input.indexOf(':'));
+            String sendTxt = input.substring(input.indexOf(':') + 1);
+
+            if (sendName.equals(userName)) {
+                return;
+            }
+
+            JLabel nameLb = new JLabel(sendName);
+            JLabel msgLb = new JLabel(sendTxt);
+
+            nameLb.setHorizontalAlignment(JLabel.LEFT);
+            nameLb.setBounds(10, nextMsgLocation, 340, 20);
+            nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+            nameLb.setForeground(Color.GRAY);
+            msgPanel.add(nameLb);
+            nextMsgLocation += 20;
+
+            msgLb.setHorizontalAlignment(JLabel.LEFT);
+            msgLb.setBounds(10, nextMsgLocation, 340, 20);
+            msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+            msgPanel.add(msgLb);
+            nextMsgLocation += 30;
         }
-
-        JLabel nameLb = new JLabel(sendName);
-        JLabel msgLb = new JLabel(sendTxt);
-
-        nameLb.setHorizontalAlignment(JLabel.LEFT);
-        nameLb.setBounds(10, nextMsgLocation, 340, 20);
-        nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-        nameLb.setForeground(Color.GRAY);
-        msgPanel.add(nameLb);
-        nextMsgLocation += 20;
-
-        msgLb.setHorizontalAlignment(JLabel.LEFT);
-        msgLb.setBounds(10, nextMsgLocation, 340, 20);
-        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-        msgPanel.add(msgLb);
-        nextMsgLocation += 30;
 
         if (nextMsgLocation >= 450) {
             // 패널 크기 갱신
