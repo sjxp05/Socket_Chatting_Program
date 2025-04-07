@@ -25,6 +25,8 @@ public class ImsiServer {
                     }
                     System.out.print("메시지 입력: ");
                 }
+
+                sc.close();
             }
         } catch (Exception e) {
             String errMsg = e.getMessage();
