@@ -186,7 +186,7 @@ public class Client extends JFrame {
             msgPanel.revalidate();
         }
 
-        repaint(); // 이거 꼭 넣어라 제발ㄹㄹㄹ
+        repaint();
 
         SwingUtilities.invokeLater(() -> {
             scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
