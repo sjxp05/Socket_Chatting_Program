@@ -143,7 +143,7 @@ public class Client extends JFrame {
             while (true) {
                 waitForStart();
                 try {
-                    sendNotice(" 이 들어왔습니다.");
+                    sendNotice(" 님이 참여했습니다.");
                     flag = false;
                 } catch (Exception e) {
                     System.out.println("오류 발생: " + e.getMessage());
@@ -180,7 +180,7 @@ public class Client extends JFrame {
             while (true) {
                 waitForStart();
                 try {
-                    sendNotice(" 이 나갔습니다.");
+                    sendNotice(" 님이 나갔습니다.");
                     flag = false;
                 } catch (Exception e) {
                     System.out.println("오류 발생: " + e.getMessage());

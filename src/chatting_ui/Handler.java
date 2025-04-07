@@ -3,7 +3,7 @@ package chatting_ui;
 import java.io.*;
 import java.net.*;
 
-public class Handler {
+public class Handler extends Thread {
     Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
