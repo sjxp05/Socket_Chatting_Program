@@ -100,10 +100,8 @@ public class Client3 extends JFrame {
                         continue SetNickname;
                     }
 
-                    if (Handler.nicknameList.indexOf(userName) >= 0) {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                    } else {
-                        Handler.nicknameList.add(userName);
+                    if (Server.nicknameList.indexOf(userName) == -1) {
+                        Server.nicknameList.add(userName);
                         try {
                             PrintWriter nameWriter = new PrintWriter(
                                     new FileOutputStream(new File("src/chatting_ui/client3Name.txt")));
@@ -114,6 +112,10 @@ public class Client3 extends JFrame {
                         }
 
                         break SetNickname;
+
+                    } else {
+                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                        continue SetNickname;
                     }
                 } else {
                     nickNameMsg = "올바르지 않은 닉네임입니다.";

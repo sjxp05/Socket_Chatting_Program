@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class Handler extends Thread {
     static ArrayList<PrintWriter> writerList = new ArrayList<>();
-    static ArrayList<String> nicknameList = new ArrayList<>();
 
     private Socket socket;
     private BufferedReader in;
@@ -28,7 +27,7 @@ public class Handler extends Thread {
     public void run() {
         try {
             this.userName = in.readLine();
-            nicknameList.add(userName);
+            Server.nicknameList.add(userName);
             System.out.println("[" + userName + " 연결됨]");
             sendAll(userName + " 님이 참여했습니다.");
 
@@ -42,7 +41,7 @@ public class Handler extends Thread {
         } finally {
             sendAll(userName + " 님이 나갔습니다.");
             writerList.remove(out);
-            nicknameList.remove(userName);
+            Server.nicknameList.remove(userName);
 
             try {
                 socket.close();
