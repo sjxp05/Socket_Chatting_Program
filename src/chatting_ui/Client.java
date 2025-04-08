@@ -22,8 +22,8 @@ public class Client extends JFrame {
     private SyncOnUpdate sync = new SyncOnUpdate();
 
     private static Socket socket = null;
-    private static BufferedReader reader;
-    private static PrintWriter writer;
+    private static BufferedReader in;
+    private static PrintWriter out;
 
     String userName = "Client1";
     String lastSpeaker = "";
@@ -142,13 +142,13 @@ public class Client extends JFrame {
         if (msg.length() == 0) {
             return;
         }
-        writer.println(userName + ":" + msg);
+        out.println(userName + ":" + msg);
     }
 
     synchronized void readMessage() {
         String input = "";
         try {
-            input = reader.readLine();
+            input = in.readLine();
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());
         }
@@ -233,13 +233,13 @@ public class Client extends JFrame {
     public static void main(String[] args) {
         try {
             socket = new Socket("localhost", 12345);
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
 
             Client client = new Client();
-            writer.println(client.userName);
+            out.println(client.userName);
 
-            while (reader != null) {
+            while (in != null) {
                 client.readMessage();
             }
         } catch (Exception e) {
