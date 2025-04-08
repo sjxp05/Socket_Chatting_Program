@@ -78,7 +78,10 @@ public class Client2 extends JFrame {
         pane.add(sendBt);
 
         setVisible(true);
+        this.setNickname();
+    }
 
+    void setNickname() {
         try {
             BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/client2Name.txt"));
             userName = nameReader.readLine();
@@ -100,28 +103,32 @@ public class Client2 extends JFrame {
                         continue SetNickname;
                     }
 
-                    if (Server.nicknameList.indexOf(userName) == -1) {
-                        Server.nicknameList.add(userName);
-                        try {
-                            PrintWriter nameWriter = new PrintWriter(
-                                    new FileOutputStream(new File("src/chatting_ui/client2Name.txt")));
-                            nameWriter.println(userName);
-                            nameWriter.close();
-                        } catch (Exception e) {
-                            System.out.println("오류 발생: " + e.getMessage());
+                    for (String existingName : Server.nicknameList) {
+                        if (userName.equals(existingName)) {
+                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                            continue SetNickname;
                         }
-
-                        break SetNickname;
-
-                    } else {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        continue SetNickname;
                     }
+
+                    try {
+                        PrintWriter nameWriter = new PrintWriter(
+                                new FileOutputStream(new File("src/chatting_ui/client2Name.txt")));
+                        nameWriter.println(userName);
+                        nameWriter.close();
+                    } catch (Exception e) {
+                        System.out.println("오류 발생: " + e.getMessage());
+                    }
+
+                    out.println(userName);
+                    break SetNickname;
+
                 } else {
                     nickNameMsg = "올바르지 않은 닉네임입니다.";
                     continue SetNickname;
                 }
             }
+        } else {
+            out.println(userName);
         }
     }
 
@@ -282,7 +289,6 @@ public class Client2 extends JFrame {
             out = new PrintWriter(socket.getOutputStream(), true);
 
             Client2 client2 = new Client2();
-            out.println(client2.userName);
 
             while (in != null) {
                 client2.readMessage();
