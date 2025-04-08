@@ -25,7 +25,7 @@ public class Client extends JFrame {
     private static BufferedReader in;
     private static PrintWriter out;
 
-    String userName = "Client1";
+    String userName = "";
     String lastSpeaker = "";
     private int nextMsgLocation = 10;
 
@@ -78,6 +78,49 @@ public class Client extends JFrame {
         pane.add(sendBt);
 
         setVisible(true);
+
+        try {
+            BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/clientName.txt"));
+            userName = nameReader.readLine();
+            nameReader.close();
+        } catch (Exception e) {
+            System.out.println("오류 발생: " + e.getMessage());
+        }
+
+        if (userName == null || userName.strip().length() == 0) {
+            String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
+
+            SetNickname: while (true) {
+                userName = JOptionPane.showInputDialog(nickNameMsg);
+                userName = userName.strip();
+
+                if (userName.length() > 0) {
+                    if (userName.indexOf(':') >= 0) {
+                        nickNameMsg = "올바르지 않은 닉네임입니다.";
+                        continue SetNickname;
+                    }
+
+                    if (Handler.nicknameList.indexOf(userName) >= 0) {
+                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                    } else {
+                        Handler.nicknameList.add(userName);
+                        try {
+                            PrintWriter nameWriter = new PrintWriter(
+                                    new FileOutputStream(new File("src/chatting_ui/clientName.txt")));
+                            nameWriter.println(userName);
+                            nameWriter.close();
+                        } catch (Exception e) {
+                            System.out.println("오류 발생: " + e.getMessage());
+                        }
+
+                        break SetNickname;
+                    }
+                } else {
+                    nickNameMsg = "올바르지 않은 닉네임입니다.";
+                    continue SetNickname;
+                }
+            }
+        }
     }
 
     class PressEnter implements KeyListener {
