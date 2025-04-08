@@ -15,6 +15,7 @@ public class Server {
         nicknames.remove(userName);
     }
 
+    // 성공하면 지울거임
     public static void printNicknames() {
         for (String i : nicknames) {
             System.out.println(i);

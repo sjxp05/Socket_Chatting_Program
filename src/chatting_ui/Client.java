@@ -78,7 +78,7 @@ public class Client extends JFrame {
         pane.add(sendBt);
 
         setVisible(true);
-        this.setNickname();
+        setNickname();
     }
 
     void setNickname() {
@@ -95,8 +95,7 @@ public class Client extends JFrame {
             String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
 
             SetNickname: while (true) {
-                userName = JOptionPane.showInputDialog(nickNameMsg);
-                userName = userName.strip();
+                userName = Client.nicknameWindow(nickNameMsg).strip();
 
                 if (userName.length() > 0) {
                     if (userName.indexOf(';') >= 0) {
@@ -104,37 +103,44 @@ public class Client extends JFrame {
                         continue SetNickname;
                     }
 
-                    boolean added = Server.addNickname(userName);
-                    if (added == false) {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        continue SetNickname;
-                    }
-
+                    // 중복체크
+                    out.println(userName);
                     try {
-                        PrintWriter nameWriter = new PrintWriter(
-                                new BufferedWriter(new FileWriter(new File("src/chatting_ui/clientName.txt"))));
-                        nameWriter.println(userName);
-                        nameWriter.close();
+                        if (in.readLine().equals("OK")) {
+                            PrintWriter nameWriter = new PrintWriter(
+                                    new BufferedWriter(new FileWriter(new File("src/chatting_ui/clientName.txt"))));
+                            nameWriter.println(userName);
+                            nameWriter.close();
+
+                            return;
+
+                        } else {
+                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                            continue SetNickname;
+                        }
                     } catch (Exception e) {
                         System.out.println("오류 발생: " + e.getMessage());
                     }
-
-                    SwingUtilities.invokeLater(() -> {
-                        out.println(userName);
-                    });
-                    return;
-
                 } else {
                     nickNameMsg = "올바르지 않은 닉네임입니다.";
                     continue SetNickname;
                 }
             }
         } else {
-            Server.addNickname(userName);
-            SwingUtilities.invokeLater(() -> {
-                out.println(userName);
-            });
+            out.println(userName);
+            try {
+                if (in.readLine().equals("OK")) {
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("오류 발생: " + e.getMessage());
+            }
         }
+    }
+
+    synchronized static String nicknameWindow(String nickNameMsg) {
+        String input = JOptionPane.showInputDialog(nickNameMsg);
+        return input;
     }
 
     class PressEnter implements KeyListener {

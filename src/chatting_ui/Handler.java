@@ -10,7 +10,9 @@ public class Handler extends Thread {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+
     String userName;
+    private boolean nameCheck = false;
 
     public Handler(Socket clientSocket) {
         try {
@@ -26,10 +28,17 @@ public class Handler extends Thread {
     @Override
     public void run() {
         try {
-            this.userName = in.readLine();
+            while (true) {
+                userName = in.readLine();
+                nicknameCheck(userName);
+                if (nameCheck == true) {
+                    break;
+                }
+            }
+
+            nicknameCheck(userName);
             System.out.println("[" + userName + " 연결됨]");
             sendAll(userName + " 님이 참여했습니다.");
-            Server.printNicknames();
 
             while (in != null) {
                 String inputMsg = in.readLine();
@@ -48,6 +57,15 @@ public class Handler extends Thread {
             } catch (IOException e2) {
                 System.out.println("오류 발생: " + e2.getMessage());
             }
+        }
+    }
+
+    void nicknameCheck(String nickname) {
+        if (Server.addNickname(nickname) == true) {
+            nameCheck = true;
+            out.println("OK");
+        } else {
+            out.println("EXIST");
         }
     }
 
