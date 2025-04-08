@@ -2,7 +2,7 @@ package chatting_ui;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Handler extends Thread {
     static ArrayList<PrintWriter> writerList = new ArrayList<>();
@@ -27,9 +27,9 @@ public class Handler extends Thread {
     public void run() {
         try {
             this.userName = in.readLine();
-            Server.nicknameList.add(userName);
             System.out.println("[" + userName + " 연결됨]");
             sendAll(userName + " 님이 참여했습니다.");
+            Server.printNicknames();
 
             while (in != null) {
                 String inputMsg = in.readLine();
@@ -41,7 +41,7 @@ public class Handler extends Thread {
         } finally {
             sendAll(userName + " 님이 나갔습니다.");
             writerList.remove(out);
-            Server.nicknameList.remove(userName);
+            Server.removeNickname(userName);
 
             try {
                 socket.close();

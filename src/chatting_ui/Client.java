@@ -91,6 +91,7 @@ public class Client extends JFrame {
         }
 
         if (userName == null || userName.strip().length() == 0) {
+
             String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
 
             SetNickname: while (true) {
@@ -98,28 +99,29 @@ public class Client extends JFrame {
                 userName = userName.strip();
 
                 if (userName.length() > 0) {
-                    if (userName.indexOf(':') >= 0) {
-                        nickNameMsg = "올바르지 않은 닉네임입니다.";
+                    if (userName.indexOf(';') >= 0) {
+                        nickNameMsg = "닉네임에는 ';' 기호를 사용할 수 없습니다.";
                         continue SetNickname;
                     }
 
-                    for (String existingName : Server.nicknameList) {
-                        if (userName.equals(existingName)) {
-                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                            continue SetNickname;
-                        }
+                    boolean added = Server.addNickname(userName);
+                    if (added == false) {
+                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                        continue SetNickname;
                     }
 
                     try {
                         PrintWriter nameWriter = new PrintWriter(
-                                new FileOutputStream(new File("src/chatting_ui/clientName.txt")));
+                                new BufferedWriter(new FileWriter(new File("src/chatting_ui/clientName.txt"))));
                         nameWriter.println(userName);
                         nameWriter.close();
                     } catch (Exception e) {
                         System.out.println("오류 발생: " + e.getMessage());
                     }
 
-                    out.println(userName);
+                    SwingUtilities.invokeLater(() -> {
+                        out.println(userName);
+                    });
                     return;
 
                 } else {
@@ -128,7 +130,10 @@ public class Client extends JFrame {
                 }
             }
         } else {
-            out.println(userName);
+            Server.addNickname(userName);
+            SwingUtilities.invokeLater(() -> {
+                out.println(userName);
+            });
         }
     }
 
@@ -194,7 +199,7 @@ public class Client extends JFrame {
         if (msg.length() == 0) {
             return;
         }
-        out.println(userName + ":" + msg);
+        out.println(userName + ";" + msg);
     }
 
     synchronized void readMessage() {
@@ -205,7 +210,7 @@ public class Client extends JFrame {
             System.out.println("오류 발생: " + e.getMessage());
         }
 
-        if (input.indexOf(':') == -1) {
+        if (input.indexOf(';') == -1) {
             if (input.indexOf('.') >= 0) {
                 JLabel noticeLb = new JLabel(input);
 
@@ -222,8 +227,8 @@ public class Client extends JFrame {
                 return;
             }
         } else {
-            String sendName = input.substring(0, input.indexOf(':'));
-            String sendTxt = input.substring(input.indexOf(':') + 1);
+            String sendName = input.substring(0, input.indexOf(';'));
+            String sendTxt = input.substring(input.indexOf(';') + 1);
 
             JLabel nameLb = new JLabel(sendName);
             JLabel msgLb = new JLabel(sendTxt);
