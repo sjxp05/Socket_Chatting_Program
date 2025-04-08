@@ -104,19 +104,24 @@ public class Client2 extends JFrame {
                     }
 
                     // 중복체크
-                    out.println(userName);
                     try {
-                        if (in.readLine().equals("OK")) {
-                            PrintWriter nameWriter = new PrintWriter(
-                                    new BufferedWriter(new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
-                            nameWriter.println(userName);
-                            nameWriter.close();
+                        while (true) {
+                            out.println(userName);
+                            String isMessage = in.readLine();
 
-                            return;
+                            if (isMessage.equals("OK")) {
+                                PrintWriter nameWriter = new PrintWriter(
+                                        new BufferedWriter(
+                                                new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
+                                nameWriter.println(userName);
+                                nameWriter.close();
 
-                        } else {
-                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                            continue SetNickname;
+                                return;
+
+                            } else if (isMessage.equals("EXIST")) {
+                                nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                                continue SetNickname;
+                            }
                         }
                     } catch (Exception e) {
                         System.out.println("오류 발생: " + e.getMessage());
@@ -126,10 +131,15 @@ public class Client2 extends JFrame {
                     continue SetNickname;
                 }
             }
-        } else
-
-        {
-
+        } else {
+            out.println(userName);
+            try {
+                if (in.readLine() != null) {
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("오류 발생: " + e.getMessage());
+            }
         }
     }
 
