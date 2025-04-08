@@ -15,13 +15,6 @@ public class Server {
         nicknames.remove(userName);
     }
 
-    // 성공하면 지울거임
-    public static void printNicknames() {
-        for (String i : nicknames) {
-            System.out.println(i);
-        }
-    }
-
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(12345)) {
             System.out.println("서버를 시작합니다.");

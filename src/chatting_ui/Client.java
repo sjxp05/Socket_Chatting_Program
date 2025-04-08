@@ -129,7 +129,7 @@ public class Client extends JFrame {
         } else {
             out.println(userName);
             try {
-                if (in.readLine().equals("OK")) {
+                if (in.readLine() != null) {
                     return;
                 }
             } catch (Exception e) {
