@@ -42,10 +42,9 @@ public class Handler extends Thread {
             while (in != null) {
                 String inputMsg = in.readLine();
 
-                // if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@nick") >= 0) {
-                // continue;
-                // } else
-                if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@change") >= 0) {
+                if (inputMsg.equals("@viewNickname")) {
+                    nicknameInfo();
+                } else if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@change") >= 0) {
                     nicknameCheck(inputMsg.substring(0, inputMsg.indexOf('@')));
                     if (nameCheck == true) {
                         Server.removeNickname(userName);
@@ -79,6 +78,17 @@ public class Handler extends Thread {
         } else {
             out.println("EXIST@nick");
         }
+    }
+
+    void nicknameInfo() {
+        Set<String> list = Server.viewNickname();
+
+        for (String name : list) {
+            out.println(name + "@view@" + userName);
+            System.out.println(name + "@view@" + userName);
+        }
+        out.println("@viewend@" + userName);
+        System.out.println("@viewend@" + userName);
     }
 
     private void sendAll(String msg) {

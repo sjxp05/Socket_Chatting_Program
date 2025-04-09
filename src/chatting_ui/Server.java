@@ -15,6 +15,10 @@ public class Server {
         nicknames.remove(userName);
     }
 
+    public static Set<String> viewNickname() {
+        return nicknames;
+    }
+
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(12345)) {
             System.out.println("서버를 시작합니다.");

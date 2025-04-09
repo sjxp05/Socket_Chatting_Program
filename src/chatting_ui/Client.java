@@ -2,7 +2,7 @@ package chatting_ui;
 
 import java.io.*;
 import java.net.*;
-
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +18,11 @@ public class Client extends JFrame {
     JTextField textField = new JTextField();
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
-    JButton nickChangeBt = new JButton("이름변경");
+
+    JButton membersBt = new JButton("참가자");
+    JPanel membersPanel = new JPanel();
+    JScrollPane memScroll = new JScrollPane(membersPanel);
+    JButton nickChangeBt = new JButton("이름 변경");
 
     private SyncOnUpdate sync = new SyncOnUpdate();
 
@@ -30,12 +34,16 @@ public class Client extends JFrame {
         WAITING, TRUE, FALSE
     };
 
-    String userName = "";
-    String lastSpeaker = "";
-    private int nextMsgLocation = 10;
-    Status changed = Status.WAITING;
+    private Status changed = Status.WAITING;
 
-    public Client() {
+    private String userName = "";
+    private String lastSpeaker = "";
+    private int nextMsgLocation = 10;
+    private boolean viewMode = false;
+    String receivedName = "";
+    boolean canAdd = false;
+
+    private Client() {
         setTitle("New Chat");
         setSize(400, 600);
         setResizable(false);
@@ -47,7 +55,7 @@ public class Client extends JFrame {
 
         roomName.setFont(new Font("Sans Serif", Font.BOLD, 15));
         roomName.setHorizontalAlignment(JLabel.CENTER);
-        roomName.setBounds(100, 5, 200, 40);
+        roomName.setBounds(92, 5, 200, 40);
         pane.add(roomName);
 
         exitBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
@@ -60,15 +68,34 @@ public class Client extends JFrame {
         });
         pane.add(exitBt);
 
-        nickChangeBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
-        nickChangeBt.setBounds(292, 5, 85, 40);
+        membersBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
+        membersBt.setBounds(307, 5, 70, 40);
+        membersBt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sync.start("members");
+            }
+        });
+        pane.add(membersBt);
+
+        membersPanel.setBounds(0, 0, 400, 435);
+        membersPanel.setBackground(Color.LIGHT_GRAY);
+        membersPanel.setLayout(null);
+
+        memScroll.setBounds(10, 50, 368, 435);
+        memScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        memScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        pane.add(memScroll);
+        memScroll.setVisible(false);
+
+        nickChangeBt.setFont(new Font("Sans Serif", Font.BOLD, 10));
+        nickChangeBt.setBounds(260, 15, 80, 30);
         nickChangeBt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sync.start("change");
             }
         });
-        pane.add(nickChangeBt);
 
         msgPanel.setBounds(0, 0, 350, 435);
         msgPanel.setLayout(null);
@@ -95,6 +122,68 @@ public class Client extends JFrame {
 
         setVisible(true);
         setNickname();
+    }
+
+    class SyncOnUpdate implements Runnable {
+        boolean flag = false;
+        String option;
+
+        SyncOnUpdate() {
+            Thread thread = new Thread(this);
+            thread.start();
+        }
+
+        synchronized void start(String optionReceived) {
+            flag = true;
+            option = optionReceived;
+            this.notify();
+        }
+
+        synchronized void waitForStart() {
+            if (!flag) {
+                try {
+                    this.wait();
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                waitForStart();
+                try {
+                    if (option.equals("send")) {
+                        sendMessage();
+                    } else if (option.equals("change")) {
+                        changeNickname();
+                    } else if (option.equals("members")) {
+                        viewMembers();
+                    }
+                    flag = false;
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    class PressEnter implements KeyListener {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                sync.start("send");
+            }
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
     }
 
     void setNickname() {
@@ -213,63 +302,64 @@ public class Client extends JFrame {
         }
     }
 
-    class PressEnter implements KeyListener {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                sync.start("send");
-            }
-        }
+    void viewMembers() {
+        if (viewMode) {
+            membersPanel.removeAll();
+            memScroll.setVisible(false);
+            viewMode = false;
+        } else {
+            int nextMemberLocation = 10;
+            ArrayList<String> list = new ArrayList<>();
+            receivedName = "";
+            canAdd = false;
 
-        @Override
-        public void keyTyped(KeyEvent e) {
-        }
+            JLabel myLb = new JLabel("      " + userName);
+            myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
+            myLb.setOpaque(true);
+            myLb.setBackground(new Color(239, 232, 180));
+            myLb.setBounds(0, nextMemberLocation, 400, 40);
 
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
-    }
+            membersPanel.add(myLb);
+            nextMemberLocation += 50;
 
-    class SyncOnUpdate implements Runnable {
-        boolean flag = false;
-        String option;
+            membersPanel.add(nickChangeBt);
 
-        SyncOnUpdate() {
-            Thread thread = new Thread(this);
-            thread.start();
-        }
-
-        synchronized void start(String optionReceived) {
-            flag = true;
-            option = optionReceived;
-            this.notify();
-        }
-
-        synchronized void waitForStart() {
-            if (!flag) {
-                try {
-                    this.wait();
-                } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
-                }
-            }
-        }
-
-        @Override
-        public void run() {
+            out.println("@viewNickname");
             while (true) {
-                waitForStart();
-                try {
-                    if (option.equals("send")) {
-                        sendMessage();
-                    } else if (option.equals("change")) {
-                        changeNickname();
+                if (canAdd) {
+                    canAdd = false;
+
+                    if (receivedName.equals("@end")) {
+                        break;
                     }
-                    flag = false;
-                } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
+
+                    if (!receivedName.equals(userName)) {
+                        list.add(receivedName);
+                    }
                 }
             }
+
+            for (String name : list) {
+                JLabel nameLb = new JLabel("      " + name);
+                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+                nameLb.setOpaque(true);
+                nameLb.setBackground(Color.WHITE);
+                nameLb.setBounds(0, nextMemberLocation, 400, 40);
+
+                membersPanel.add(nameLb);
+                nextMemberLocation += 50;
+            }
+            System.out.println("labels added");
+
+            if (nextMemberLocation >= 435) {
+                membersPanel.setPreferredSize(new Dimension(400, nextMemberLocation));
+                membersPanel.revalidate();
+                repaint();
+            }
+
+            memScroll.setVisible(true);
+            System.out.println("show panel");
+            viewMode = true;
         }
     }
 
@@ -297,6 +387,16 @@ public class Client extends JFrame {
             return;
         } else if (input.equals("EXIST@nick")) {
             changed = Status.FALSE;
+            return;
+        } else if (input.equals("@viewend@" + userName)) {
+            receivedName = "@end";
+            canAdd = true;
+            return;
+        } else if (input.indexOf("@view") >= 0) {
+            if (input.indexOf("@" + userName) >= 0) {
+                receivedName = input.substring(0, input.indexOf('@'));
+                canAdd = true;
+            }
             return;
         }
 
@@ -362,7 +462,7 @@ public class Client extends JFrame {
             }
         }
 
-        if (nextMsgLocation >= 405) {
+        if (nextMsgLocation >= 435) {
             // 패널 크기 갱신
             msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
             msgPanel.revalidate();
@@ -372,6 +472,7 @@ public class Client extends JFrame {
         SwingUtilities.invokeLater(() -> { // 스크롤바 내리기: 나중에 반영
             scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
         });
+        return;
     }
 
     public static void main(String[] args) {
