@@ -3,6 +3,7 @@ package chatting_ui;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -214,38 +215,40 @@ public class Client extends JFrame {
         SetNickname: while (true) {
             userName = JOptionPane.showInputDialog(nickNameMsg).strip();
 
-            if (userName.length() > 0) {
-                if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
-                    nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
-                    continue SetNickname;
-                }
-
-                // 중복체크
-                try {
-                    while (true) {
-                        out.println(userName);
-                        String isMessage = in.readLine();
-
-                        if (isMessage.equals("OK@nick")) {
-                            PrintWriter nameWriter = new PrintWriter(
-                                    new BufferedWriter(
-                                            new FileWriter(new File("src/chatting_ui/clientName.txt"))));
-                            nameWriter.println(userName);
-                            nameWriter.close();
-
-                            return;
-
-                        } else if (isMessage.equals("EXIST@nick")) {
-                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                            continue SetNickname;
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
-                }
-            } else {
-                nickNameMsg = "올바르지 않은 닉네임입니다.";
+            // 길이제한
+            if (userName.length() == 0 || userName.length() > 15) {
+                nickNameMsg = "닉네임은 1~15자이어야 합니다.";
                 continue SetNickname;
+            }
+
+            // 기호제한
+            if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
+                nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                continue SetNickname;
+            }
+
+            // 중복체크
+            try {
+                while (true) {
+                    out.println(userName);
+                    String isMessage = in.readLine();
+
+                    if (isMessage.equals("OK@nick")) {
+                        PrintWriter nameWriter = new PrintWriter(
+                                new BufferedWriter(
+                                        new FileWriter(new File("src/chatting_ui/clientName.txt"))));
+                        nameWriter.println(userName);
+                        nameWriter.close();
+
+                        return;
+
+                    } else if (isMessage.equals("EXIST@nick")) {
+                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                        continue SetNickname;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("오류 발생: " + e.getMessage());
             }
         }
     }
@@ -256,47 +259,51 @@ public class Client extends JFrame {
         ChangeNickname: while (true) {
             String newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
 
-            if (newName.length() > 0) {
-                if (newName.equals(userName)) {
-                    return;
+            // 이름이 바뀌지 않았을 경우
+            if (newName.equals(userName)) {
+                return;
+            }
+
+            // 길이제한
+            if (newName.length() == 0 || newName.length() > 15) {
+                nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                continue ChangeNickname;
+            }
+
+            // 기호제한
+            if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
+                nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                continue ChangeNickname;
+            }
+
+            // 중복체크
+            try {
+                out.println(newName + "@change");
+                while (true) {
+                    if (changed != Status.WAITING) {
+                        break;
+                    }
                 }
 
-                if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
-                    nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                if (changed == Status.TRUE) {
+                    userName = newName;
+
+                    PrintWriter nameWriter = new PrintWriter(
+                            new BufferedWriter(
+                                    new FileWriter(new File("src/chatting_ui/clientName.txt"))));
+                    nameWriter.println(userName);
+                    nameWriter.close();
+
+                    changed = Status.WAITING;
+                    return;
+
+                } else if (changed == Status.FALSE) {
+                    nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                    changed = Status.WAITING;
                     continue ChangeNickname;
                 }
-
-                // 중복체크
-                try {
-                    out.println(newName + "@change");
-                    while (true) {
-                        if (changed != Status.WAITING) {
-                            break;
-                        }
-                    }
-
-                    if (changed == Status.TRUE) {
-                        userName = newName;
-
-                        PrintWriter nameWriter = new PrintWriter(
-                                new BufferedWriter(
-                                        new FileWriter(new File("src/chatting_ui/clientName.txt"))));
-                        nameWriter.println(userName);
-                        nameWriter.close();
-
-                        changed = Status.WAITING;
-                        return;
-
-                    } else if (changed == Status.FALSE) {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        changed = Status.WAITING;
-                        continue ChangeNickname;
-                    }
-                } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
-                }
-            } else {
-                return;
+            } catch (Exception e) {
+                System.out.println("오류 발생: " + e.getMessage());
             }
         }
     }
