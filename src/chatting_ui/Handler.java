@@ -32,6 +32,7 @@ public class Handler extends Thread {
                 userName = in.readLine();
                 nicknameCheck(userName);
                 if (nameCheck == true) {
+                    nameCheck = false;
                     break;
                 }
             }

@@ -19,7 +19,7 @@ public class Client3 extends JFrame {
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
 
-    JButton membersBt = new JButton("참가자");
+    JButton membersBt = new JButton("참여자");
     JPanel membersPanel = new JPanel();
     JScrollPane memScroll = new JScrollPane(membersPanel);
     JButton nickChangeBt = new JButton("이름 변경");
@@ -301,10 +301,12 @@ public class Client3 extends JFrame {
 
     void viewMembers() {
         if (viewMode) {
+            membersBt.setText("참여자");
             membersPanel.removeAll();
             memScroll.setVisible(false);
             viewMode = false;
         } else {
+            membersBt.setText("채팅");
             int nextMemberLocation = 10;
             nameList.clear();
 
@@ -322,7 +324,7 @@ public class Client3 extends JFrame {
 
             out.println("@viewNickname");
             while (true) {
-                System.out.println("waiting...");
+                System.out.print("");
                 if (added == true) {
                     break;
                 }
@@ -343,6 +345,10 @@ public class Client3 extends JFrame {
                 membersPanel.setPreferredSize(new Dimension(400, nextMemberLocation));
                 membersPanel.revalidate();
                 repaint();
+
+                SwingUtilities.invokeLater(() -> {
+                    memScroll.getVerticalScrollBar().setValue(memScroll.getVerticalScrollBar().getMaximum());
+                });
             }
 
             memScroll.setVisible(true);
