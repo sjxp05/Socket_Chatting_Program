@@ -42,7 +42,12 @@ public class Handler extends Thread {
 
             while (in != null) {
                 String inputMsg = in.readLine();
-                sendAll(inputMsg);
+
+                if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@change") >= 0) {
+                    nicknameCheck(inputMsg.substring(0, inputMsg.indexOf('@')));
+                } else {
+                    sendAll(inputMsg);
+                }
             }
         } catch (IOException e) {
             System.out.println("[" + userName + " 접속 끊김]");
