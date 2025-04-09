@@ -18,6 +18,7 @@ public class Client2 extends JFrame {
     JTextField textField = new JTextField();
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
+    JButton nickChangeBt = new JButton("이름변경");
 
     private SyncOnUpdate sync = new SyncOnUpdate();
 
@@ -25,9 +26,14 @@ public class Client2 extends JFrame {
     private static BufferedReader in;
     private static PrintWriter out;
 
+    enum Status {
+        WAITING, TRUE, FALSE
+    };
+
     String userName = "";
     String lastSpeaker = "";
     private int nextMsgLocation = 10;
+    Status changed = Status.WAITING;
 
     public Client2() {
         setTitle("New Chat");
@@ -54,6 +60,16 @@ public class Client2 extends JFrame {
         });
         pane.add(exitBt);
 
+        nickChangeBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
+        nickChangeBt.setBounds(292, 5, 85, 40);
+        nickChangeBt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sync.start("change");
+            }
+        });
+        pane.add(nickChangeBt);
+
         msgPanel.setBounds(0, 0, 350, 435);
         msgPanel.setLayout(null);
 
@@ -72,7 +88,7 @@ public class Client2 extends JFrame {
         sendBt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sync.start();
+                sync.start("send");
             }
         });
         pane.add(sendBt);
@@ -91,15 +107,14 @@ public class Client2 extends JFrame {
         }
 
         if (userName == null || userName.strip().length() == 0) {
-
             String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
 
             SetNickname: while (true) {
-                userName = Client2.nicknameWindow(nickNameMsg).strip();
+                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
 
                 if (userName.length() > 0) {
-                    if (userName.indexOf(';') >= 0) {
-                        nickNameMsg = "닉네임에는 ';' 기호를 사용할 수 없습니다.";
+                    if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
+                        nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
                         continue SetNickname;
                     }
 
@@ -109,7 +124,7 @@ public class Client2 extends JFrame {
                             out.println(userName);
                             String isMessage = in.readLine();
 
-                            if (isMessage.equals("OK")) {
+                            if (isMessage.equals("OK@nick")) {
                                 PrintWriter nameWriter = new PrintWriter(
                                         new BufferedWriter(
                                                 new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
@@ -118,7 +133,7 @@ public class Client2 extends JFrame {
 
                                 return;
 
-                            } else if (isMessage.equals("EXIST")) {
+                            } else if (isMessage.equals("EXIST@nick")) {
                                 nickNameMsg = "이미 사용 중인 닉네임입니다.";
                                 continue SetNickname;
                             }
@@ -143,16 +158,66 @@ public class Client2 extends JFrame {
         }
     }
 
-    synchronized static String nicknameWindow(String nickNameMsg) {
-        String input = JOptionPane.showInputDialog(nickNameMsg);
-        return input;
+    void changeNickname() {
+        String nickNameMsg = "변경할 닉네임을 입력해 주세요.";
+
+        ChangeNickname: while (true) {
+            String newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+
+            if (newName.length() > 0) {
+                if (newName.equals(userName)) {
+                    return;
+                }
+
+                if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
+                    nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                    continue ChangeNickname;
+                }
+
+                // 중복체크
+                try {
+                    out.println(newName + "@change");
+                    while (true) {
+                        // System.out.println("waiting...");
+                        if (changed != Status.WAITING) {
+                            break;
+                        }
+                    }
+
+                    if (changed == Status.TRUE) {
+                        userName = newName;
+                        // System.out.println("changed nickname");
+
+                        PrintWriter nameWriter = new PrintWriter(
+                                new BufferedWriter(
+                                        new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
+                        nameWriter.println(userName);
+                        nameWriter.close();
+                        // System.out.println("saved nickname");
+
+                        changed = Status.WAITING;
+                        return;
+
+                    } else if (changed == Status.FALSE) {
+                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                        // System.out.println("failed");
+                        changed = Status.WAITING;
+                        continue ChangeNickname;
+                    }
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            } else {
+                return;
+            }
+        }
     }
 
     class PressEnter implements KeyListener {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                sync.start();
+                sync.start("send");
             }
         }
 
@@ -167,14 +232,16 @@ public class Client2 extends JFrame {
 
     class SyncOnUpdate implements Runnable {
         boolean flag = false;
+        String option;
 
         SyncOnUpdate() {
             Thread thread = new Thread(this);
             thread.start();
         }
 
-        synchronized void start() {
+        synchronized void start(String optionReceived) {
             flag = true;
+            option = optionReceived;
             this.notify();
         }
 
@@ -193,7 +260,11 @@ public class Client2 extends JFrame {
             while (true) {
                 waitForStart();
                 try {
-                    sendMessage();
+                    if (option.equals("send")) {
+                        sendMessage();
+                    } else if (option.equals("change")) {
+                        changeNickname();
+                    }
                     flag = false;
                 } catch (Exception e) {
                     System.out.println("오류 발생: " + e.getMessage());
@@ -221,9 +292,17 @@ public class Client2 extends JFrame {
             System.out.println("오류 발생: " + e.getMessage());
         }
 
+        if (input.equals("OK@nick")) {
+            changed = Status.TRUE;
+            return;
+        } else if (input.equals("EXIST@nick")) {
+            changed = Status.FALSE;
+            return;
+        }
+
         if (input.indexOf(';') == -1) {
-            if (input.indexOf('.') >= 0) {
-                JLabel noticeLb = new JLabel(input);
+            if (input.indexOf('@') == 0) {
+                JLabel noticeLb = new JLabel(input.substring(1));
 
                 noticeLb.setHorizontalAlignment(JLabel.CENTER);
                 noticeLb.setBounds(10, nextMsgLocation, 340, 20);
@@ -233,9 +312,6 @@ public class Client2 extends JFrame {
 
                 lastSpeaker = "";
                 nextMsgLocation += 25;
-
-            } else {
-                return;
             }
         } else {
             String sendName = input.substring(0, input.indexOf(';'));
