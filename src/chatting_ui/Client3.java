@@ -196,54 +196,56 @@ public class Client3 extends JFrame {
             System.out.println("오류 발생: " + e.getMessage());
         }
 
-        if (userName == null || userName.strip().length() == 0) {
-            String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
-
-            SetNickname: while (true) {
-                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
-
-                if (userName.length() > 0) {
-                    if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
-                        nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
-                        continue SetNickname;
-                    }
-
-                    // 중복체크
-                    try {
-                        while (true) {
-                            out.println(userName);
-                            String isMessage = in.readLine();
-
-                            if (isMessage.equals("OK@nick")) {
-                                PrintWriter nameWriter = new PrintWriter(
-                                        new BufferedWriter(
-                                                new FileWriter(new File("src/chatting_ui/client3Name.txt"))));
-                                nameWriter.println(userName);
-                                nameWriter.close();
-
-                                return;
-
-                            } else if (isMessage.equals("EXIST@nick")) {
-                                nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                                continue SetNickname;
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.out.println("오류 발생: " + e.getMessage());
-                    }
-                } else {
-                    nickNameMsg = "올바르지 않은 닉네임입니다.";
-                    continue SetNickname;
-                }
-            }
-        } else {
-            out.println(userName);
+        if (userName != null && userName.strip().length() > 0) {
             try {
-                if (in.readLine() != null) {
+                out.println(userName);
+                String isMessage = in.readLine();
+
+                if (isMessage.equals("OK@nick")) {
                     return;
                 }
             } catch (Exception e) {
                 System.out.println("오류 발생: " + e.getMessage());
+            }
+        }
+
+        String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
+
+        SetNickname: while (true) {
+            userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+
+            if (userName.length() > 0) {
+                if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
+                    nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                    continue SetNickname;
+                }
+
+                // 중복체크
+                try {
+                    while (true) {
+                        out.println(userName);
+                        String isMessage = in.readLine();
+
+                        if (isMessage.equals("OK@nick")) {
+                            PrintWriter nameWriter = new PrintWriter(
+                                    new BufferedWriter(
+                                            new FileWriter(new File("src/chatting_ui/client3Name.txt"))));
+                            nameWriter.println(userName);
+                            nameWriter.close();
+
+                            return;
+
+                        } else if (isMessage.equals("EXIST@nick")) {
+                            nickNameMsg = "이미 사용 중인 닉네임입니다.";
+                            continue SetNickname;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("오류 발생: " + e.getMessage());
+                }
+            } else {
+                nickNameMsg = "올바르지 않은 닉네임입니다.";
+                continue SetNickname;
             }
         }
     }
