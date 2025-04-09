@@ -36,15 +36,22 @@ public class Handler extends Thread {
                 }
             }
 
-            nicknameCheck(userName);
             System.out.println("[" + userName + " 연결됨]");
-            sendAll(userName + " 님이 참여했습니다.");
+            sendAll("@" + userName + " 님이 참여했습니다.");
 
             while (in != null) {
                 String inputMsg = in.readLine();
 
+                // if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@nick") >= 0) {
+                // continue;
+                // } else
                 if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@change") >= 0) {
                     nicknameCheck(inputMsg.substring(0, inputMsg.indexOf('@')));
+                    if (nameCheck == true) {
+                        Server.removeNickname(userName);
+                        userName = inputMsg.substring(0, inputMsg.indexOf('@'));
+                        System.out.println("[" + userName + " 으로 닉네임 변경]");
+                    }
                 } else {
                     sendAll(inputMsg);
                 }
@@ -53,7 +60,7 @@ public class Handler extends Thread {
             System.out.println("[" + userName + " 접속 끊김]");
 
         } finally {
-            sendAll(userName + " 님이 나갔습니다.");
+            sendAll("@" + userName + " 님이 나갔습니다.");
             writerList.remove(out);
             Server.removeNickname(userName);
 
@@ -68,9 +75,9 @@ public class Handler extends Thread {
     void nicknameCheck(String nickname) {
         if (Server.addNickname(nickname) == true) {
             nameCheck = true;
-            out.println("OK");
+            out.println("OK@nick");
         } else {
-            out.println("EXIST");
+            out.println("EXIST@nick");
         }
     }
 
