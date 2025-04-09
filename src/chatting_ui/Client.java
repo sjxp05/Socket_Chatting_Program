@@ -307,7 +307,6 @@ public class Client extends JFrame {
             int nextMemberLocation = 10;
             ArrayList<String> list = new ArrayList<>();
             receivedName = "";
-            canAdd = false;
 
             JLabel myLb = new JLabel("      " + userName);
             myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
@@ -319,6 +318,7 @@ public class Client extends JFrame {
             nextMemberLocation += 50;
 
             membersPanel.add(nickChangeBt);
+            membersPanel.setComponentZOrder(nickChangeBt, 0);
 
             out.println("@viewNickname");
             while (true) {
@@ -346,7 +346,6 @@ public class Client extends JFrame {
                 membersPanel.add(nameLb);
                 nextMemberLocation += 50;
             }
-            System.out.println("labels added");
 
             if (nextMemberLocation >= 435) {
                 membersPanel.setPreferredSize(new Dimension(400, nextMemberLocation));

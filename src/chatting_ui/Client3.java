@@ -11,7 +11,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
-public class Client2 extends JFrame {
+public class Client3 extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방");
     JPanel msgPanel = new JPanel();
     JScrollPane scroll = new JScrollPane(msgPanel);
@@ -43,7 +43,7 @@ public class Client2 extends JFrame {
     String receivedName = "";
     boolean canAdd = false;
 
-    private Client2() {
+    private Client3() {
         setTitle("New Chat");
         setSize(400, 600);
         setResizable(false);
@@ -188,7 +188,7 @@ public class Client2 extends JFrame {
 
     void setNickname() {
         try {
-            BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/client2Name.txt"));
+            BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/client3Name.txt"));
             userName = nameReader.readLine();
             nameReader.close();
         } catch (Exception e) {
@@ -216,7 +216,7 @@ public class Client2 extends JFrame {
                             if (isMessage.equals("OK@nick")) {
                                 PrintWriter nameWriter = new PrintWriter(
                                         new BufferedWriter(
-                                                new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
+                                                new FileWriter(new File("src/chatting_ui/client3Name.txt"))));
                                 nameWriter.println(userName);
                                 nameWriter.close();
 
@@ -277,7 +277,7 @@ public class Client2 extends JFrame {
 
                         PrintWriter nameWriter = new PrintWriter(
                                 new BufferedWriter(
-                                        new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
+                                        new FileWriter(new File("src/chatting_ui/client3Name.txt"))));
                         nameWriter.println(userName);
                         nameWriter.close();
 
@@ -476,10 +476,10 @@ public class Client2 extends JFrame {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            Client2 client2 = new Client2();
+            Client3 client3 = new Client3();
 
             while (in != null) {
-                client2.readMessage();
+                client3.readMessage();
             }
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());
