@@ -267,7 +267,6 @@ public class Client extends JFrame {
                 try {
                     out.println(newName + "@change");
                     while (true) {
-                        // System.out.println("waiting...");
                         if (changed != Status.WAITING) {
                             break;
                         }
@@ -275,21 +274,18 @@ public class Client extends JFrame {
 
                     if (changed == Status.TRUE) {
                         userName = newName;
-                        // System.out.println("changed nickname");
 
                         PrintWriter nameWriter = new PrintWriter(
                                 new BufferedWriter(
                                         new FileWriter(new File("src/chatting_ui/clientName.txt"))));
                         nameWriter.println(userName);
                         nameWriter.close();
-                        // System.out.println("saved nickname");
 
                         changed = Status.WAITING;
                         return;
 
                     } else if (changed == Status.FALSE) {
                         nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        // System.out.println("failed");
                         changed = Status.WAITING;
                         continue ChangeNickname;
                     }
@@ -332,10 +328,11 @@ public class Client extends JFrame {
                     if (receivedName.equals("@end")) {
                         break;
                     }
-
                     if (!receivedName.equals(userName)) {
                         list.add(receivedName);
                     }
+                } else {
+                    continue; // 이게 진짜 중요하다..
                 }
             }
 
@@ -358,7 +355,6 @@ public class Client extends JFrame {
             }
 
             memScroll.setVisible(true);
-            System.out.println("show panel");
             viewMode = true;
         }
     }
