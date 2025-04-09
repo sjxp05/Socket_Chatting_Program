@@ -40,8 +40,9 @@ public class Client extends JFrame {
     private String lastSpeaker = "";
     private int nextMsgLocation = 10;
     private boolean viewMode = false;
-    String receivedName = "";
-    boolean canAdd = false;
+
+    ArrayList<String> nameList = new ArrayList<>();
+    private boolean added = false;
 
     private Client() {
         setTitle("New Chat");
@@ -305,8 +306,7 @@ public class Client extends JFrame {
             viewMode = false;
         } else {
             int nextMemberLocation = 10;
-            ArrayList<String> list = new ArrayList<>();
-            receivedName = "";
+            nameList.clear();
 
             JLabel myLb = new JLabel("      " + userName);
             myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
@@ -322,21 +322,13 @@ public class Client extends JFrame {
 
             out.println("@viewNickname");
             while (true) {
-                if (canAdd) {
-                    canAdd = false;
-
-                    if (receivedName.equals("@end")) {
-                        break;
-                    }
-                    if (!receivedName.equals(userName)) {
-                        list.add(receivedName);
-                    }
-                } else {
-                    continue; // 이게 진짜 중요하다..
+                System.out.println("waiting...");
+                if (added == true) {
+                    break;
                 }
             }
 
-            for (String name : list) {
+            for (String name : nameList) {
                 JLabel nameLb = new JLabel("      " + name);
                 nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 nameLb.setOpaque(true);
@@ -354,6 +346,7 @@ public class Client extends JFrame {
             }
 
             memScroll.setVisible(true);
+            added = false;
             viewMode = true;
         }
     }
@@ -384,13 +377,12 @@ public class Client extends JFrame {
             changed = Status.FALSE;
             return;
         } else if (input.equals("@viewend@" + userName)) {
-            receivedName = "@end";
-            canAdd = true;
+            added = true;
             return;
-        } else if (input.indexOf("@view") >= 0) {
-            if (input.indexOf("@" + userName) >= 0) {
-                receivedName = input.substring(0, input.indexOf('@'));
-                canAdd = true;
+        } else if (input.indexOf("@view@" + userName) >= 0) {
+            String name = input.substring(0, input.indexOf('@'));
+            if (!name.equals(userName)) {
+                nameList.add(name);
             }
             return;
         }
