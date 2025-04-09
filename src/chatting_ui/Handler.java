@@ -85,10 +85,8 @@ public class Handler extends Thread {
 
         for (String name : list) {
             out.println(name + "@view@" + userName);
-            System.out.println(name + "@view@" + userName);
         }
         out.println("@viewend@" + userName);
-        System.out.println("@viewend@" + userName);
     }
 
     private void sendAll(String msg) {
