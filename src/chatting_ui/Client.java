@@ -404,8 +404,11 @@ public class Client extends JFrame {
 
         if (input.indexOf(';') == -1) {
             if (input.indexOf('@') == 0) {
-                JLabel noticeLb = new JLabel(input.substring(1));
+                if (viewMode) {
+                    viewMembers();
+                }
 
+                JLabel noticeLb = new JLabel(input.substring(1));
                 noticeLb.setHorizontalAlignment(JLabel.CENTER);
                 noticeLb.setBounds(10, nextMsgLocation, 340, 20);
                 noticeLb.setFont(new Font("Sans Serif", Font.PLAIN, 13));
@@ -416,6 +419,10 @@ public class Client extends JFrame {
                 nextMsgLocation += 25;
             }
         } else {
+            if (viewMode) {
+                viewMembers();
+            }
+
             String sendName = input.substring(0, input.indexOf(';'));
             String sendTxt = input.substring(input.indexOf(';') + 1);
 
