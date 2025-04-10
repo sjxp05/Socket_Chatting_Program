@@ -209,12 +209,10 @@ public class Client extends JFrame {
             userName = nameReader.readLine();
             nameReader.close();
         } catch (FileNotFoundException e) { // 파일이 없을 경우 넘어가기
-            System.out.print("");
+            userName = "";
         } catch (IOException e) { // 기타 오류의 경우 프로그램 강제 종료
             System.out.println("오류 발생: " + e.getMessage());
             System.exit(1);
-        } finally {
-            userName = "";
         }
 
         // 이미 쓰던 닉네임이 있는 경우
