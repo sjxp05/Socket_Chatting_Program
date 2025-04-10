@@ -16,7 +16,9 @@
 
     - Swing으로 이쁘게 GUI 구현 (사실 아직 개ㅐㅐㅐㅐ 이쁘지는 않음.. 나중에 더 손볼예정)
 
-    \* `Client2.java`, `Client3.java`: 이 파일들은 `Client.java` 파일을 두 번 이상 동시에 돌릴 수가 없어서 복붙해서 만들어 놓은 파일임!
+    \* `Client.java`에는 함수나 객체들 기능을 쉽게 구별할 수 있도록 자세한 주석을 달아놓았습니당
+
+    \* `Client2.java`, `Client3.java`: 이 파일들은 `Client.java` 파일을 두 번 이상 동시에 돌릴 수가 없어서 복붙해서 만들어 놓은 임시파일임!
 
 3. **`Handler.java`**
 

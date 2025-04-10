@@ -216,7 +216,7 @@ public class Client extends JFrame {
         }
 
         // 이미 쓰던 닉네임이 있는 경우
-        if (userName != null && userName.strip().length() > 0) {
+        if (userName.strip().length() > 0) {
             try {
                 out.println(userName);
                 String isMessage = in.readLine();
@@ -238,7 +238,11 @@ public class Client extends JFrame {
         // 조건 충족시킬 때까지 계속해서 닉네임 받기
         SetNickname: while (true) {
             // 새로운 닉네임 받기
-            userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+            try {
+                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+            } catch (Exception e) { // 취소 누른 경우 강제 종료
+                System.exit(1);
+            }
 
             // 길이제한
             if (userName.length() == 0 || userName.length() > 15) {
@@ -285,7 +289,12 @@ public class Client extends JFrame {
 
         ChangeNickname: while (true) {
             // 변경할 닉네임 입력받기 (현재 이름이 기본으로 입력되어 있음)
-            String newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+            String newName;
+            try {
+                newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+            } catch (Exception e) { // 취소 눌렀을 시 변화 없이 원래 화면으로 돌아가기
+                return;
+            }
 
             // 이름이 바뀌지 않았을 경우
             if (newName.equals(userName)) {

@@ -199,7 +199,7 @@ public class Client2 extends JFrame {
             System.exit(1);
         }
 
-        if (userName != null && userName.strip().length() > 0) {
+        if (userName.strip().length() > 0) {
             try {
                 out.println(userName);
                 String isMessage = in.readLine();
@@ -215,7 +215,11 @@ public class Client2 extends JFrame {
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
 
         SetNickname: while (true) {
-            userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+            try {
+                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+            } catch (Exception e) { // 취소 누른 경우 강제 종료
+                System.exit(1);
+            }
 
             // 길이제한
             if (userName.length() == 0 || userName.length() > 15) {
@@ -259,7 +263,12 @@ public class Client2 extends JFrame {
         String nickNameMsg = "변경할 닉네임을 입력해 주세요.";
 
         ChangeNickname: while (true) {
-            String newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+            String newName;
+            try {
+                newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+            } catch (Exception e) { // 취소 눌렀을 시 변화 없이 원래 화면으로 돌아가기
+                return;
+            }
 
             // 이름이 바뀌지 않았을 경우
             if (newName.equals(userName)) {
