@@ -192,8 +192,13 @@ public class Client3 extends JFrame {
             BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/client3Name.txt"));
             userName = nameReader.readLine();
             nameReader.close();
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) { // 파일이 없을 경우 넘어가기
+            System.out.print("");
+        } catch (IOException e) { // 기타 오류의 경우 프로그램 강제 종료
             System.out.println("오류 발생: " + e.getMessage());
+            System.exit(1);
+        } finally {
+            userName = "";
         }
 
         if (userName != null && userName.strip().length() > 0) {
@@ -353,10 +358,6 @@ public class Client3 extends JFrame {
                 membersPanel.setPreferredSize(new Dimension(400, nextMemberLocation));
                 membersPanel.revalidate();
                 repaint();
-
-                SwingUtilities.invokeLater(() -> {
-                    memScroll.getVerticalScrollBar().setValue(memScroll.getVerticalScrollBar().getMaximum());
-                });
             }
 
             memScroll.setVisible(true);
