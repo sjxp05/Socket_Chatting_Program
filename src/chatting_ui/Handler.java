@@ -66,8 +66,8 @@ public class Handler extends Thread {
 
             try {
                 socket.close();
-            } catch (IOException e2) {
-                System.out.println("오류 발생: " + e2.getMessage());
+            } catch (IOException ex) {
+                System.out.println("오류 발생: " + ex.getMessage());
             }
         }
     }
@@ -85,9 +85,9 @@ public class Handler extends Thread {
         Set<String> list = Server.viewNickname();
 
         for (String name : list) {
-            out.println(name + "@view@" + userName);
+            out.println(name + "@view");
         }
-        out.println("@viewend@" + userName);
+        out.println("@viewend");
     }
 
     private void sendAll(String msg) {

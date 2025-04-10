@@ -26,6 +26,7 @@ public class Client extends JFrame {
     JButton nickChangeBt = new JButton("이름 변경");
 
     private SyncOnUpdate sync = new SyncOnUpdate();
+    private ArrayList<String> nameList = new ArrayList<>();
 
     private static Socket socket = null;
     private static BufferedReader in;
@@ -41,8 +42,6 @@ public class Client extends JFrame {
     private String lastSpeaker = "";
     private int nextMsgLocation = 10;
     private boolean viewMode = false;
-
-    ArrayList<String> nameList = new ArrayList<>();
     private boolean added = false;
 
     private Client() {
@@ -391,10 +390,10 @@ public class Client extends JFrame {
         } else if (input.equals("EXIST@nick")) {
             changed = Status.FALSE;
             return;
-        } else if (input.equals("@viewend@" + userName)) {
+        } else if (input.equals("@viewend")) {
             added = true;
             return;
-        } else if (input.indexOf("@view@" + userName) >= 0) {
+        } else if (input.indexOf("@view") >= 0) {
             String name = input.substring(0, input.indexOf('@'));
             if (!name.equals(userName)) {
                 nameList.add(name);
