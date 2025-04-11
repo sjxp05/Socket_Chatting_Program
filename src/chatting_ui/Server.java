@@ -13,7 +13,7 @@ public class Server {
     private static File serverSaveFile = new File(serverHome, "last_id.txt");
 
     // 닉네임 추가하기
-    public static void addNickname(String userName) {
+    public static synchronized void addNickname(String userName) {
         userInfo.putIfAbsent(newUserID, userName);
         newUserID++;
 
@@ -27,16 +27,16 @@ public class Server {
     }
 
     // 닉네임 변경하기/기존회원 닉네임 추가
-    public static void existingNickname(int userID, String userName) {
+    public static synchronized void existingNickname(int userID, String userName) {
         userInfo.put(userID, userName);
     }
 
-    public static void removeNickname(int userID) {
+    public static synchronized void removeNickname(int userID) {
         userInfo.remove(userID);
     }
 
     // 현재 모든 닉네임 목록 불러오기
-    public static ConcurrentHashMap<Integer, String> viewNickname() {
+    public static synchronized ConcurrentHashMap<Integer, String> viewNickname() {
         return userInfo;
     }
 
