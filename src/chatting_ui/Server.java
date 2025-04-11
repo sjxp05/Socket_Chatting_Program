@@ -1,36 +1,67 @@
 package chatting_ui;
 
+import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
-    // 닉네임 저장할때 필요한 동기화 자동으로 되는 해시세트
-    private static final Set<String> nicknames = ConcurrentHashMap.newKeySet();
+    // 닉네임 저장할때 필요한 동기화 자동으로 되는 해시맵
+    private static final ConcurrentHashMap<Integer, String> userInfo = new ConcurrentHashMap<>();
+    private static int newUserID = 0;
 
-    // 닉네임 추가하기 및 성공 여부 반환
-    public static boolean addNickname(String userName) {
-        return nicknames.add(userName);
+    private static String serverHome = System.getProperty("user.home");
+    private static File serverSaveFile = new File(serverHome, "last_id.txt");
+
+    // 닉네임 추가하기
+    public static void addNickname(String userName) {
+        userInfo.putIfAbsent(newUserID, userName);
+        newUserID++;
+
+        try {
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
+            writer.println(newUserID);
+            writer.close();
+        } catch (Exception e) {
+            System.exit(1);
+        }
     }
 
-    // 닉네임 삭제하기
-    public static void removeNickname(String userName) {
-        nicknames.remove(userName);
+    // 닉네임 변경하기/기존회원 닉네임 추가
+    public static void existingNickname(int userID, String userName) {
+        userInfo.put(userID, userName);
+    }
+
+    public static void removeNickname(int userID) {
+        userInfo.remove(userID);
     }
 
     // 현재 모든 닉네임 목록 불러오기
-    public static Set<String> viewNickname() {
-        return nicknames;
+    public static ConcurrentHashMap<Integer, String> viewNickname() {
+        return userInfo;
     }
 
     public static void main(String[] args) {
+        try {
+            if (serverSaveFile.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(serverSaveFile));
+                newUserID = Integer.parseInt(reader.readLine());
+                reader.close();
+            } else {
+                PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
+                writer.println("0");
+                writer.close();
+            }
+        } catch (Exception e) {
+            System.exit(1);
+        }
+
         try (ServerSocket serverSocket = new ServerSocket(12345)) {
             System.out.println("서버 가동 중...");
 
             // 서버가 가동되는 동안 클라이언트 계속해서 받기
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                Handler handler = new Handler(clientSocket); // 받은 소켓 하나당 스레드(핸들러 객체) 하나 추가하기
+                Handler handler = new Handler(clientSocket, newUserID); // 받은 소켓 하나당 스레드(핸들러 객체) 하나 추가하기
                 handler.start();
                 System.out.println("클라이언트와 연결되었습니다.");
             }

@@ -33,16 +33,11 @@ public class Main extends JFrame {
     private static PrintWriter out;
 
     private String userHome = System.getProperty("user.home");
-    private File saveFile = new File(userHome, "chat-client-name.txt");
+    private File saveFile = new File(userHome, "chat-client-info.txt");
 
-    enum Status {
-        WAITING, TRUE, FALSE
-    };
-
-    private Status changed = Status.WAITING;
-
+    private int userID;
     private String userName = "";
-    private String lastSpeaker = "";
+    private int lastSpeakerID = -1;
     private int nextMsgLocation = 10;
     private boolean viewMode = false;
     private boolean added = false;
@@ -194,6 +189,7 @@ public class Main extends JFrame {
         if (saveFile.exists()) {
             try {
                 BufferedReader nameReader = new BufferedReader(new FileReader(saveFile));
+                userID = Integer.parseInt(nameReader.readLine());
                 userName = nameReader.readLine();
                 nameReader.close();
             } catch (Exception e) {
@@ -203,10 +199,9 @@ public class Main extends JFrame {
 
         if (userName.strip().length() > 0) {
             try {
-                out.println(userName);
-                String isMessage = in.readLine();
-
-                if (isMessage.equals("OK@nick")) {
+                out.println("" + userID + "@" + userName);
+                String confirmMsg = in.readLine();
+                if (confirmMsg.indexOf("OK@") == 0) {
                     return;
                 }
             } catch (Exception e) {
@@ -234,22 +229,20 @@ public class Main extends JFrame {
             }
 
             try {
-                while (true) {
-                    out.println(userName);
-                    String isMessage = in.readLine();
+                out.println(userName);
+                String confirmMsg = in.readLine();
 
-                    if (isMessage.equals("OK@nick")) {
-                        PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
-                        nameWriter.println(userName);
-                        nameWriter.close();
+                if (confirmMsg.indexOf("OK@") == 0) {
+                    userID = Integer.parseInt(confirmMsg.substring(confirmMsg.indexOf("@") + 1));
 
-                        return;
+                    PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
+                    nameWriter.println(userID);
+                    nameWriter.println(userName);
+                    nameWriter.close();
 
-                    } else if (isMessage.equals("EXIST@nick")) {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        continue SetNickname;
-                    }
+                    return;
                 }
+
             } catch (Exception e) {
                 System.exit(1);
             }
@@ -283,31 +276,19 @@ public class Main extends JFrame {
 
             try {
                 out.println(newName + "@change");
-                while (true) {
-                    if (changed != Status.WAITING) {
-                        break;
-                    }
-                }
+                userName = newName;
 
-                if (changed == Status.TRUE) {
-                    userName = newName;
+                PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
+                nameWriter.println(userID);
+                nameWriter.println(userName);
+                nameWriter.close();
+                return;
 
-                    PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
-                    nameWriter.println(userName);
-                    nameWriter.close();
-
-                    changed = Status.WAITING;
-                    return;
-
-                } else if (changed == Status.FALSE) {
-                    nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                    changed = Status.WAITING;
-                    continue ChangeNickname;
-                }
             } catch (Exception e) {
                 System.exit(1);
             }
         }
+
     }
 
     void viewMembers() {
@@ -333,8 +314,9 @@ public class Main extends JFrame {
             membersPanel.add(nickChangeBt);
             membersPanel.setComponentZOrder(nickChangeBt, 0);
 
-            out.println("@viewNickname");
+            out.println("@viewNickname@");
             while (true) {
+                System.out.print("");
                 if (added == true) {
                     nameList.sort(null);
                     break;
@@ -372,7 +354,7 @@ public class Main extends JFrame {
         if (msg.length() == 0) {
             return;
         }
-        out.println(userName + ";" + msg);
+        out.println(userName + ";" + msg + ';' + userID);
     }
 
     synchronized void readMessage() {
@@ -383,19 +365,21 @@ public class Main extends JFrame {
             System.exit(1);
         }
 
-        if (input.equals("OK@nick")) {
-            changed = Status.TRUE;
-            return;
-        } else if (input.equals("EXIST@nick")) {
-            changed = Status.FALSE;
-            return;
-        } else if (input.equals("@viewend")) {
+        if (input.equals("@viewend")) {
             added = true;
             return;
-        } else if (input.indexOf("@view") >= 0) {
-            String name = input.substring(0, input.indexOf('@'));
-            if (!name.equals(userName)) {
-                nameList.add(name);
+        } else if (input.indexOf("@view@") >= 0) {
+            String[] info = input.split("@");
+
+            if (Integer.parseInt(info[2]) != userID) {
+                nameList.add(info[0]);
+            }
+            return;
+        } else if (input.indexOf("@changed@") >= 0) {
+            int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
+
+            if (changedID == lastSpeakerID) {
+                lastSpeakerID = -1;
             }
             return;
         }
@@ -413,7 +397,7 @@ public class Main extends JFrame {
                 noticeLb.setForeground(Color.GRAY);
                 msgPanel.add(noticeLb);
 
-                lastSpeaker = "";
+                lastSpeakerID = -1;
                 nextMsgLocation += 25;
             }
         } else {
@@ -421,14 +405,14 @@ public class Main extends JFrame {
                 viewMembers();
             }
 
-            String sendName = input.substring(0, input.indexOf(';'));
-            String sendTxt = input.substring(input.indexOf(';') + 1);
+            String[] receivedMsg = input.split(";");
 
-            JLabel nameLb = new JLabel(sendName);
-            JLabel msgLb = new JLabel(sendTxt);
+            JLabel nameLb = new JLabel(receivedMsg[0]);
+            JLabel msgLb = new JLabel(receivedMsg[1]);
+            int sendID = Integer.parseInt(receivedMsg[2]);
 
-            if (sendName.equals(userName)) {
-                if (sendName.equals(lastSpeaker)) {
+            if (sendID == userID) {
+                if (sendID == lastSpeakerID) {
                     nextMsgLocation -= 10;
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.RIGHT);
@@ -437,7 +421,7 @@ public class Main extends JFrame {
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
-                    lastSpeaker = sendName;
+                    lastSpeakerID = sendID;
                     nextMsgLocation += 22;
                 }
 
@@ -448,7 +432,7 @@ public class Main extends JFrame {
                 nextMsgLocation += 32;
 
             } else {
-                if (sendName.equals(lastSpeaker)) {
+                if (sendID == lastSpeakerID) {
                     nextMsgLocation -= 10;
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.LEFT);
@@ -457,7 +441,7 @@ public class Main extends JFrame {
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
-                    lastSpeaker = sendName;
+                    lastSpeakerID = sendID;
                     nextMsgLocation += 22;
                 }
 

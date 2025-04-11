@@ -32,14 +32,12 @@ public class Client2 extends JFrame {
     private static BufferedReader in;
     private static PrintWriter out;
 
-    enum Status {
-        WAITING, TRUE, FALSE
-    };
+    private String userHome = System.getProperty("user.home");
+    private File saveFile = new File(userHome, "chat-client2-info.txt");
 
-    private Status changed = Status.WAITING;
-
+    private int userID;
     private String userName = "";
-    private String lastSpeaker = "";
+    private int lastSpeakerID = -1;
     private int nextMsgLocation = 10;
     private boolean viewMode = false;
     private boolean added = false;
@@ -145,7 +143,7 @@ public class Client2 extends JFrame {
                 try {
                     this.wait();
                 } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
+                    System.exit(1);
                 }
             }
         }
@@ -164,7 +162,7 @@ public class Client2 extends JFrame {
                     }
                     flag = false;
                 } catch (Exception e) {
-                    System.out.println("오류 발생: " + e.getMessage());
+                    System.exit(1);
                 }
             }
         }
@@ -188,27 +186,26 @@ public class Client2 extends JFrame {
     }
 
     void setNickname() {
-        try {
-            BufferedReader nameReader = new BufferedReader(new FileReader("src/chatting_ui/client2Name.txt"));
-            userName = nameReader.readLine();
-            nameReader.close();
-        } catch (FileNotFoundException e) { // 파일이 없을 경우 넘어가기
-            userName = "";
-        } catch (IOException e) { // 기타 오류의 경우 프로그램 강제 종료
-            System.out.println("오류 발생: " + e.getMessage());
-            System.exit(1);
+        if (saveFile.exists()) {
+            try {
+                BufferedReader nameReader = new BufferedReader(new FileReader(saveFile));
+                userID = Integer.parseInt(nameReader.readLine());
+                userName = nameReader.readLine();
+                nameReader.close();
+            } catch (Exception e) {
+                System.exit(1);
+            }
         }
 
         if (userName.strip().length() > 0) {
             try {
-                out.println(userName);
-                String isMessage = in.readLine();
-
-                if (isMessage.equals("OK@nick")) {
+                out.println("" + userID + "@" + userName);
+                String confirmMsg = in.readLine();
+                if (confirmMsg.indexOf("OK@") == 0) {
                     return;
                 }
             } catch (Exception e) {
-                System.out.println("오류 발생: " + e.getMessage());
+                System.exit(1);
             }
         }
 
@@ -217,44 +214,37 @@ public class Client2 extends JFrame {
         SetNickname: while (true) {
             try {
                 userName = JOptionPane.showInputDialog(nickNameMsg).strip();
-            } catch (Exception e) { // 취소 누른 경우 강제 종료
+            } catch (Exception e) {
                 System.exit(1);
             }
 
-            // 길이제한
             if (userName.length() == 0 || userName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
                 continue SetNickname;
             }
 
-            // 기호제한
             if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
                 continue SetNickname;
             }
 
-            // 중복체크
             try {
-                while (true) {
-                    out.println(userName);
-                    String isMessage = in.readLine();
+                out.println(userName);
+                String confirmMsg = in.readLine();
 
-                    if (isMessage.equals("OK@nick")) {
-                        PrintWriter nameWriter = new PrintWriter(
-                                new BufferedWriter(
-                                        new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
-                        nameWriter.println(userName);
-                        nameWriter.close();
+                if (confirmMsg.indexOf("OK@") == 0) {
+                    userID = Integer.parseInt(confirmMsg.substring(confirmMsg.indexOf("@") + 1));
 
-                        return;
+                    PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
+                    nameWriter.println(userID);
+                    nameWriter.println(userName);
+                    nameWriter.close();
 
-                    } else if (isMessage.equals("EXIST@nick")) {
-                        nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                        continue SetNickname;
-                    }
+                    return;
                 }
+
             } catch (Exception e) {
-                System.out.println("오류 발생: " + e.getMessage());
+                System.exit(1);
             }
         }
     }
@@ -266,57 +256,39 @@ public class Client2 extends JFrame {
             String newName;
             try {
                 newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
-            } catch (Exception e) { // 취소 눌렀을 시 변화 없이 원래 화면으로 돌아가기
+            } catch (Exception e) {
                 return;
             }
 
-            // 이름이 바뀌지 않았을 경우
             if (newName.equals(userName)) {
                 return;
             }
 
-            // 길이제한
             if (newName.length() == 0 || newName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
                 continue ChangeNickname;
             }
 
-            // 기호제한
             if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
                 continue ChangeNickname;
             }
 
-            // 중복체크
             try {
                 out.println(newName + "@change");
-                while (true) {
-                    if (changed != Status.WAITING) {
-                        break;
-                    }
-                }
+                userName = newName;
 
-                if (changed == Status.TRUE) {
-                    userName = newName;
+                PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
+                nameWriter.println(userID);
+                nameWriter.println(userName);
+                nameWriter.close();
+                return;
 
-                    PrintWriter nameWriter = new PrintWriter(
-                            new BufferedWriter(
-                                    new FileWriter(new File("src/chatting_ui/client2Name.txt"))));
-                    nameWriter.println(userName);
-                    nameWriter.close();
-
-                    changed = Status.WAITING;
-                    return;
-
-                } else if (changed == Status.FALSE) {
-                    nickNameMsg = "이미 사용 중인 닉네임입니다.";
-                    changed = Status.WAITING;
-                    continue ChangeNickname;
-                }
             } catch (Exception e) {
-                System.out.println("오류 발생: " + e.getMessage());
+                System.exit(1);
             }
         }
+
     }
 
     void viewMembers() {
@@ -333,7 +305,7 @@ public class Client2 extends JFrame {
             JLabel myLb = new JLabel("      " + userName);
             myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
             myLb.setOpaque(true);
-            myLb.setBackground(new Color(239, 232, 180));
+            myLb.setBackground(new Color(245, 240, 190));
             myLb.setBounds(0, nextMemberLocation, 400, 40);
 
             membersPanel.add(myLb);
@@ -342,10 +314,11 @@ public class Client2 extends JFrame {
             membersPanel.add(nickChangeBt);
             membersPanel.setComponentZOrder(nickChangeBt, 0);
 
-            out.println("@viewNickname");
+            out.println("@viewNickname@");
             while (true) {
                 System.out.print("");
                 if (added == true) {
+                    nameList.sort(null);
                     break;
                 }
             }
@@ -381,7 +354,7 @@ public class Client2 extends JFrame {
         if (msg.length() == 0) {
             return;
         }
-        out.println(userName + ";" + msg);
+        out.println(userName + ";" + msg + ';' + userID);
     }
 
     synchronized void readMessage() {
@@ -389,22 +362,17 @@ public class Client2 extends JFrame {
         try {
             input = in.readLine();
         } catch (Exception e) {
-            System.out.println("오류 발생: " + e.getMessage());
+            System.exit(1);
         }
 
-        if (input.equals("OK@nick")) {
-            changed = Status.TRUE;
-            return;
-        } else if (input.equals("EXIST@nick")) {
-            changed = Status.FALSE;
-            return;
-        } else if (input.equals("@viewend")) {
+        if (input.equals("@viewend")) {
             added = true;
             return;
-        } else if (input.indexOf("@view") >= 0) {
-            String name = input.substring(0, input.indexOf('@'));
-            if (!name.equals(userName)) {
-                nameList.add(name);
+        } else if (input.indexOf("@view@") >= 0) {
+            String[] info = input.split("@");
+
+            if (Integer.parseInt(info[2]) != userID) {
+                nameList.add(info[0]);
             }
             return;
         }
@@ -422,7 +390,7 @@ public class Client2 extends JFrame {
                 noticeLb.setForeground(Color.GRAY);
                 msgPanel.add(noticeLb);
 
-                lastSpeaker = "";
+                lastSpeakerID = -1;
                 nextMsgLocation += 25;
             }
         } else {
@@ -430,14 +398,14 @@ public class Client2 extends JFrame {
                 viewMembers();
             }
 
-            String sendName = input.substring(0, input.indexOf(';'));
-            String sendTxt = input.substring(input.indexOf(';') + 1);
+            String[] receivedMsg = input.split(";");
 
-            JLabel nameLb = new JLabel(sendName);
-            JLabel msgLb = new JLabel(sendTxt);
+            JLabel nameLb = new JLabel(receivedMsg[0]);
+            JLabel msgLb = new JLabel(receivedMsg[1]);
+            int sendID = Integer.parseInt(receivedMsg[2]);
 
-            if (sendName.equals(userName)) {
-                if (sendName.equals(lastSpeaker)) {
+            if (sendID == userID) {
+                if (sendID == lastSpeakerID) {
                     nextMsgLocation -= 10;
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.RIGHT);
@@ -446,7 +414,7 @@ public class Client2 extends JFrame {
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
-                    lastSpeaker = sendName;
+                    lastSpeakerID = sendID;
                     nextMsgLocation += 22;
                 }
 
@@ -457,7 +425,7 @@ public class Client2 extends JFrame {
                 nextMsgLocation += 32;
 
             } else {
-                if (sendName.equals(lastSpeaker)) {
+                if (sendID == lastSpeakerID) {
                     nextMsgLocation -= 10;
                 } else {
                     nameLb.setHorizontalAlignment(JLabel.LEFT);
@@ -466,7 +434,7 @@ public class Client2 extends JFrame {
                     nameLb.setForeground(Color.GRAY);
                     msgPanel.add(nameLb);
 
-                    lastSpeaker = sendName;
+                    lastSpeakerID = sendID;
                     nextMsgLocation += 22;
                 }
 
@@ -479,13 +447,12 @@ public class Client2 extends JFrame {
         }
 
         if (nextMsgLocation >= 435) {
-            // 패널 크기 갱신
             msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
             msgPanel.revalidate();
         }
-        repaint(); // 변경사항을 창에 반영
+        repaint();
 
-        SwingUtilities.invokeLater(() -> { // 스크롤바 내리기: 나중에 반영
+        SwingUtilities.invokeLater(() -> {
             scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
         });
         return;
@@ -503,7 +470,7 @@ public class Client2 extends JFrame {
                 client2.readMessage();
             }
         } catch (Exception e) {
-            System.out.println("오류 발생: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
         }
     }
 }
