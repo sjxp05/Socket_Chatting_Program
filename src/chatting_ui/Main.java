@@ -16,7 +16,8 @@ public class Main extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방");
     JPanel msgPanel = new JPanel();
     JScrollPane scroll = new JScrollPane(msgPanel);
-    JTextField textField = new JTextField();
+    JTextArea textInput = new JTextArea();
+    JScrollPane textScroll = new JScrollPane(textInput);
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
 
@@ -35,12 +36,14 @@ public class Main extends JFrame {
     private String userHome = System.getProperty("user.home");
     private File saveFile = new File(userHome, "chat-client-info.txt");
 
-    private int userID;
-    private String userName = "";
-    private int lastSpeakerID = -1;
-    private int nextMsgLocation = 10;
-    private boolean viewMode = false;
-    private boolean added = false;
+    private volatile int userID;
+    private volatile String userName = "";
+    private volatile int lastSpeakerID = -1;
+    private volatile int nextMsgLocation = 10;
+    private volatile boolean shiftPressed = false;
+
+    private volatile boolean viewMode = false;
+    private volatile boolean added = false;
 
     private Main() {
         setTitle("New Chat");
@@ -103,14 +106,19 @@ public class Main extends JFrame {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         pane.add(scroll);
 
-        textField.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-        textField.setBounds(10, 500, 290, 50);
-        textField.requestFocus();
-        textField.addKeyListener(new PressEnter());
-        pane.add(textField);
+        textInput.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        textInput.setBounds(0, 0, 290, 50);
+        textInput.setLineWrap(true);
+        textInput.requestFocus();
+        textInput.addKeyListener(new PressEnter());
+
+        textScroll.setBounds(10, 500, 290, 50);
+        textScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        textScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.add(textScroll);
 
         sendBt.setFont(new Font("Sans Serif", Font.BOLD, 15));
-        sendBt.setBounds(310, 500, 70, 50);
+        sendBt.setBounds(307, 500, 70, 50);
         sendBt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -171,8 +179,21 @@ public class Main extends JFrame {
     class PressEnter implements KeyListener {
         @Override
         public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                shiftPressed = true;
+            }
+
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                sync.start("send");
+                if (shiftPressed) {
+                    StringBuffer currentTxt = new StringBuffer(textInput.getText());
+
+                    SwingUtilities.invokeLater(() -> {
+                        textInput.setText(currentTxt + "\n");
+                        textInput.requestFocus();
+                    });
+                } else {
+                    sync.start("send");
+                }
             }
         }
 
@@ -182,6 +203,9 @@ public class Main extends JFrame {
 
         @Override
         public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                shiftPressed = false;
+            }
         }
     }
 
@@ -282,25 +306,37 @@ public class Main extends JFrame {
                 nameWriter.println(userID);
                 nameWriter.println(userName);
                 nameWriter.close();
+
                 return;
 
             } catch (Exception e) {
                 System.exit(1);
             }
         }
-
     }
 
     void viewMembers() {
         if (viewMode) {
+            viewMode = false;
             membersBt.setText("참여자");
             membersPanel.removeAll();
             memScroll.setVisible(false);
-            viewMode = false;
         } else {
-            membersBt.setText("채팅");
-            int nextMemberLocation = 10;
+            viewMode = true;
             nameList.clear();
+
+            out.println("@viewNickname@");
+            while (true) {
+                if (added == true) {
+                    nameList.sort(null);
+                    added = false;
+                    break;
+                }
+            }
+
+            int nextMemberLocation = 10;
+
+            membersBt.setText("채팅");
 
             JLabel myLb = new JLabel("      " + userName);
             myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
@@ -313,15 +349,6 @@ public class Main extends JFrame {
 
             membersPanel.add(nickChangeBt);
             membersPanel.setComponentZOrder(nickChangeBt, 0);
-
-            out.println("@viewNickname@");
-            while (true) {
-                System.out.print("");
-                if (added == true) {
-                    nameList.sort(null);
-                    break;
-                }
-            }
 
             for (String name : nameList) {
                 JLabel nameLb = new JLabel("      " + name);
@@ -341,33 +368,101 @@ public class Main extends JFrame {
             }
 
             memScroll.setVisible(true);
-            added = false;
-            viewMode = true;
         }
     }
 
     void sendMessage() {
-        String msg = textField.getText().strip();
-        textField.setText("");
-        textField.requestFocus();
+        String msg = textInput.getText().strip();
+
+        SwingUtilities.invokeLater(() -> {
+            textInput.setText("");
+            textInput.requestFocus();
+        });
 
         if (msg.length() == 0) {
             return;
         }
-        out.println(userName + ";" + msg + ';' + userID);
+
+        StringBuffer htmlText = new StringBuffer("<html><body>");
+        int wordCount = 0;
+
+        for (int i = 0; i < msg.length(); i++) {
+            wordCount++;
+
+            switch (msg.charAt(i)) {
+                case ' ':
+                    htmlText.append("&nbsp;");
+                    break;
+
+                case '\n':
+                    htmlText.append("<br>");
+                    wordCount = 0;
+                    break;
+
+                case '\"':
+                    htmlText.append("&quot;");
+                    break;
+
+                case '&':
+                    htmlText.append("&amp;");
+                    break;
+
+                case '<':
+                    htmlText.append("&lt;");
+                    break;
+
+                case '>':
+                    htmlText.append("&gt;");
+                    break;
+
+                case '÷':
+                    htmlText.append("&divide;");
+                    break;
+
+                case '®':
+                    htmlText.append("&reg;");
+                    break;
+
+                case '·':
+                    htmlText.append("&middot;");
+                    break;
+
+                case '±':
+                    htmlText.append("&plusmn;");
+                    break;
+
+                case 'ⓒ':
+                    htmlText.append("&copy;");
+                    break;
+
+                case '°':
+                    htmlText.append("&deg;");
+                    break;
+
+                case '×':
+                    htmlText.append("&times;");
+                    break;
+
+                default:
+                    htmlText.append(msg.charAt(i));
+                    break;
+            }
+
+            if (wordCount == 20) {
+                htmlText.append("<br>");
+                wordCount = 0;
+            }
+        }
+        htmlText.append("</body></html>");
+
+        out.println(userName + ";" + htmlText + ';' + userID);
     }
 
-    synchronized void readMessage() {
-        String input = "";
-        try {
-            input = in.readLine();
-        } catch (Exception e) {
-            System.exit(1);
-        }
-
+    synchronized void readMessage(String input) {
         if (input.equals("@viewend")) {
             added = true;
             return;
+
         } else if (input.indexOf("@view@") >= 0) {
             String[] info = input.split("@");
 
@@ -375,8 +470,14 @@ public class Main extends JFrame {
                 nameList.add(info[0]);
             }
             return;
+
         } else if (input.indexOf("@changed@") >= 0) {
             int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
+
+            if (viewMode) { // 새로고침
+                viewMembers();
+                sync.start("members");
+            }
 
             if (changedID == lastSpeakerID) {
                 lastSpeakerID = -1;
@@ -386,8 +487,9 @@ public class Main extends JFrame {
 
         if (input.indexOf(';') == -1) {
             if (input.indexOf('@') == 0) {
-                if (viewMode) {
+                if (viewMode) { // 새로고침
                     viewMembers();
+                    sync.start("members");
                 }
 
                 JLabel noticeLb = new JLabel(input.substring(1));
@@ -401,15 +503,26 @@ public class Main extends JFrame {
                 nextMsgLocation += 25;
             }
         } else {
-            if (viewMode) {
+            if (viewMode) { // 채팅창 표시하기
                 viewMembers();
             }
 
-            String[] receivedMsg = input.split(";");
+            String sendName = input.substring(0, input.indexOf(';'));
+            String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
+            int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
+            int height = 20;
+            int lines = 1;
 
-            JLabel nameLb = new JLabel(receivedMsg[0]);
-            JLabel msgLb = new JLabel(receivedMsg[1]);
-            int sendID = Integer.parseInt(receivedMsg[2]);
+            for (int i = 12; i < sendMsg.length(); i++) {
+                if (sendMsg.indexOf("<br>", i) >= 0) {
+                    height += (21 + lines / 4);
+                    lines++;
+                    i = sendMsg.indexOf("<br>", i) + 4;
+                }
+            }
+
+            JLabel nameLb = new JLabel(sendName);
+            JLabel msgLb = new JLabel(sendMsg);
 
             if (sendID == userID) {
                 if (sendID == lastSpeakerID) {
@@ -426,10 +539,10 @@ public class Main extends JFrame {
                 }
 
                 msgLb.setHorizontalAlignment(JLabel.RIGHT);
-                msgLb.setBounds(0, nextMsgLocation, 340, 20);
+                msgLb.setBounds(0, nextMsgLocation, 340, height);
                 msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 msgPanel.add(msgLb);
-                nextMsgLocation += 32;
+                nextMsgLocation += (15 + height);
 
             } else {
                 if (sendID == lastSpeakerID) {
@@ -446,23 +559,25 @@ public class Main extends JFrame {
                 }
 
                 msgLb.setHorizontalAlignment(JLabel.LEFT);
-                msgLb.setBounds(10, nextMsgLocation, 340, 20);
+                msgLb.setBounds(10, nextMsgLocation, 340, height);
                 msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 msgPanel.add(msgLb);
-                nextMsgLocation += 32;
+                nextMsgLocation += (15 + height);
             }
         }
 
-        if (nextMsgLocation >= 435) {
-            msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
-            msgPanel.revalidate();
-        }
-        repaint();
-
         SwingUtilities.invokeLater(() -> {
-            scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
+            if (nextMsgLocation >= 435) {
+                msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
+                msgPanel.revalidate();
+            }
+            repaint();
+
+            SwingUtilities.invokeLater(() -> {
+                scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
+            });
+            return;
         });
-        return;
     }
 
     public static void main(String[] args) {
@@ -474,7 +589,7 @@ public class Main extends JFrame {
             Main main = new Main();
 
             while (in != null) {
-                main.readMessage();
+                main.readMessage(in.readLine());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
