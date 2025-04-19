@@ -17,7 +17,7 @@ public class KoreanUnicodeTest {
         System.out.println((int) ' ');
         System.out.println();
 
-        for (int i = 32; i < 128; i++) {
+        for (int i = 32; i < 256; i++) { // 대략 127번까지만 1칸짜리 유의미한 문자가 나오는듯
             System.out.print((char) i + " ");
         }
     }
