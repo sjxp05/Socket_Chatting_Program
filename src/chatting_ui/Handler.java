@@ -34,6 +34,7 @@ public class Handler extends Thread {
         ConcurrentHashMap<Integer, String> list = Server.viewNickname();
 
         for (int id : list.keySet()) {
+            // 각 사용자 닉네임 + '목록 전송 전용'이라는 뜻의 메시지 + 사용자의 고유id
             out.println(list.get(id) + "@view@" + id);
         }
         out.println("@viewend");
