@@ -287,7 +287,7 @@ public class ChatUI extends JFrame {
                 msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));
                 msgPanel.revalidate();
             }
-            msgPanel.repaint();
+            msgPanel.repaint(); // 이거 해줘야 사용자 화면에 반영됨!!
 
             SwingUtilities.invokeLater(() -> {
                 scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
@@ -321,46 +321,32 @@ public class ChatUI extends JFrame {
         JLabel msgLb = new JLabel(sendMsg); // 전송된 메시지 표시 라벨
 
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
-            if (sendID == Main.lastSpeakerID) { // 직전에 말한 사람과 같을 경우 이름 표시하지 않음
-                nextMsgLocation -= 10;
-            } else {
-                nameLb.setHorizontalAlignment(JLabel.RIGHT);
-                nameLb.setBounds(0, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-
-                Main.lastSpeakerID = sendID;
-                nextMsgLocation += 22;
-            }
-
+            nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setHorizontalAlignment(JLabel.RIGHT);
-            msgLb.setBounds(0, nextMsgLocation, 340, height);
-            msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-            msgPanel.add(msgLb);
-            nextMsgLocation += (15 + height);
-
-        } else {
-            if (sendID == Main.lastSpeakerID) {
-                nextMsgLocation -= 10;
-            } else {
-                nameLb.setHorizontalAlignment(JLabel.LEFT);
-                nameLb.setBounds(10, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-
-                Main.lastSpeakerID = sendID;
-                nextMsgLocation += 22;
-            }
-
+        } else { // 본인 외 다른 상대방의 메시지: 왼쪽에 표시
+            nameLb.setHorizontalAlignment(JLabel.LEFT);
             msgLb.setHorizontalAlignment(JLabel.LEFT);
-            msgLb.setBounds(10, nextMsgLocation, 340, height);
-            msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-            msgPanel.add(msgLb);
-            nextMsgLocation += (15 + height);
         }
 
+        if (sendID == Main.lastSpeakerID) { // 직전에 말한 사람과 같을 경우 이름 표시하지 않음
+            nextMsgLocation -= 10;
+        } else { // 이름 표시 라벨 배치
+            nameLb.setBounds(0, nextMsgLocation, 340, 20);
+            nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
+            nameLb.setForeground(Color.GRAY);
+            msgPanel.add(nameLb);
+
+            Main.lastSpeakerID = sendID;
+            nextMsgLocation += 22;
+        }
+
+        // 메시지 라벨 배치
+        msgLb.setBounds(0, nextMsgLocation, 340, height);
+        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        msgPanel.add(msgLb);
+        nextMsgLocation += (15 + height);
+
+        // 내용이 길어지면 패널 길이 수정 및 스크롤바 내리기
         SwingUtilities.invokeLater(() -> {
             if (nextMsgLocation >= 435) {
                 msgPanel.setPreferredSize(new Dimension(350, nextMsgLocation));

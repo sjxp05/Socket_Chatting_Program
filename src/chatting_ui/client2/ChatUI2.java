@@ -307,45 +307,29 @@ public class ChatUI2 extends JFrame {
         JLabel msgLb = new JLabel(sendMsg);
 
         if (sendID == Main2.userID) {
-            if (sendID == Main2.lastSpeakerID) {
-                nextMsgLocation -= 10;
-            } else {
-                nameLb.setHorizontalAlignment(JLabel.RIGHT);
-                nameLb.setBounds(0, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-
-                Main2.lastSpeakerID = sendID;
-                nextMsgLocation += 22;
-            }
-
+            nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setHorizontalAlignment(JLabel.RIGHT);
-            msgLb.setBounds(0, nextMsgLocation, 340, height);
-            msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-            msgPanel.add(msgLb);
-            nextMsgLocation += (15 + height);
-
         } else {
-            if (sendID == Main2.lastSpeakerID) {
-                nextMsgLocation -= 10;
-            } else {
-                nameLb.setHorizontalAlignment(JLabel.LEFT);
-                nameLb.setBounds(10, nextMsgLocation, 340, 20);
-                nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
-                nameLb.setForeground(Color.GRAY);
-                msgPanel.add(nameLb);
-
-                Main2.lastSpeakerID = sendID;
-                nextMsgLocation += 22;
-            }
-
+            nameLb.setHorizontalAlignment(JLabel.LEFT);
             msgLb.setHorizontalAlignment(JLabel.LEFT);
-            msgLb.setBounds(10, nextMsgLocation, 340, height);
-            msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
-            msgPanel.add(msgLb);
-            nextMsgLocation += (15 + height);
         }
+
+        if (sendID == Main2.lastSpeakerID) {
+            nextMsgLocation -= 10;
+        } else {
+            nameLb.setBounds(0, nextMsgLocation, 340, 20);
+            nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
+            nameLb.setForeground(Color.GRAY);
+            msgPanel.add(nameLb);
+
+            Main2.lastSpeakerID = sendID;
+            nextMsgLocation += 22;
+        }
+
+        msgLb.setBounds(0, nextMsgLocation, 340, height);
+        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        msgPanel.add(msgLb);
+        nextMsgLocation += (15 + height);
 
         SwingUtilities.invokeLater(() -> {
             if (nextMsgLocation >= 435) {
