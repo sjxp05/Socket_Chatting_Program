@@ -1,4 +1,4 @@
-package chatting_ui;
+package chatting_ui.client;
 
 import java.io.*;
 import java.net.*;

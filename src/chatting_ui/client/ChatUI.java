@@ -1,4 +1,4 @@
-package chatting_ui;
+package chatting_ui.client;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
