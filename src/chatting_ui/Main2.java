@@ -6,13 +6,13 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class Main {
+public class Main2 {
     private static Socket socket = null;
     private static BufferedReader in;
     private static PrintWriter out;
 
     private static String userHome = System.getProperty("user.home");
-    private static File saveFile = new File(userHome, "chat-client-info.txt");
+    private static File saveFile = new File(userHome, "chat-client2-info.txt");
 
     static ArrayList<String> nameList = new ArrayList<>();
 
@@ -21,8 +21,8 @@ public class Main {
     static volatile int lastSpeakerID = -1;
     static volatile boolean added = false;
 
-    private Main() {
-        new ChatUI();
+    private Main2() {
+        new ChatUI2();
         setNickname();
     }
 
@@ -124,7 +124,7 @@ public class Main {
                 nameWriter.println(userName);
                 nameWriter.close();
 
-                ChatUI.refresh();
+                ChatUI2.refresh();
                 return;
 
             } catch (Exception e) {
@@ -254,20 +254,20 @@ public class Main {
                 lastSpeakerID = -1;
             }
 
-            ChatUI.refresh();
+            ChatUI2.refresh();
             return;
         }
 
         if (input.indexOf(';') == -1) {
             if (input.indexOf('@') == 0) {
-                ChatUI.showNotices(input.substring(1));
+                ChatUI2.showNotices(input.substring(1));
             }
         } else {
             String sendName = input.substring(0, input.indexOf(';'));
             String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
-            ChatUI.showMessage(sendName, sendMsg, sendID);
+            ChatUI2.showMessage(sendName, sendMsg, sendID);
         }
     }
 
@@ -277,10 +277,10 @@ public class Main {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            Main main = new Main();
+            Main2 main2 = new Main2();
 
             while (in != null) {
-                main.readMessage(in.readLine());
+                main2.readMessage(in.readLine());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
