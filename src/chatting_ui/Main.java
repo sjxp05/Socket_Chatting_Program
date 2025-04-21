@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class Main {
+    ChatUI ui = new ChatUI();
+
     private static Socket socket = null;
     private static BufferedReader in;
     private static PrintWriter out;
@@ -22,7 +24,6 @@ public class Main {
     static volatile boolean added = false;
 
     private Main() {
-        new ChatUI();
         setNickname();
     }
 
@@ -124,7 +125,6 @@ public class Main {
                 nameWriter.println(userName);
                 nameWriter.close();
 
-                ChatUI.refresh();
                 return;
 
             } catch (Exception e) {
@@ -254,20 +254,20 @@ public class Main {
                 lastSpeakerID = -1;
             }
 
-            ChatUI.refresh();
+            ui.refresh();
             return;
         }
 
         if (input.indexOf(';') == -1) {
             if (input.indexOf('@') == 0) {
-                ChatUI.showNotices(input.substring(1));
+                ui.showNotices(input.substring(1));
             }
         } else {
             String sendName = input.substring(0, input.indexOf(';'));
             String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
-            ChatUI.showMessage(sendName, sendMsg, sendID);
+            ui.showMessage(sendName, sendMsg, sendID);
         }
     }
 

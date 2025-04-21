@@ -13,8 +13,8 @@ public class ChatUI2 extends JFrame {
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
 
-    static JPanel msgPanel = new JPanel();
-    static JScrollPane scroll = new JScrollPane(msgPanel);
+    JPanel msgPanel = new JPanel();
+    JScrollPane scroll = new JScrollPane(msgPanel);
     JTextArea textInput = new JTextArea();
     JScrollPane textScroll = new JScrollPane(textInput);
 
@@ -23,11 +23,11 @@ public class ChatUI2 extends JFrame {
     JScrollPane memScroll = new JScrollPane(membersPanel);
     JButton nickChangeBt = new JButton("이름 변경");
 
-    private static SyncOnUpdate sync;
+    private SyncOnUpdate sync;
 
     private volatile boolean shiftPressed = false;
-    private static volatile boolean viewMode = false;
-    private static volatile int nextMsgLocation = 10;
+    private volatile boolean viewMode = false;
+    private volatile int nextMsgLocation = 10;
 
     ChatUI2() {
         sync = this.new SyncOnUpdate();
@@ -243,6 +243,13 @@ public class ChatUI2 extends JFrame {
         }
     }
 
+    void refresh() {
+        if (viewMode) {
+            viewMembers();
+            sync.start("view");
+        }
+    }
+
     void writeMessage() {
         String msg = textInput.getText().strip();
         SwingUtilities.invokeLater(() -> {
@@ -253,19 +260,7 @@ public class ChatUI2 extends JFrame {
         Main2.sendMessage(msg);
     }
 
-    static void refresh() {
-        SwingUtilities.invokeLater(() -> {
-            if (viewMode) {
-                sync.start("view");
-
-                SwingUtilities.invokeLater(() -> {
-                    sync.start("view");
-                });
-            }
-        });
-    }
-
-    static void showNotices(String noticeMsg) {
+    void showNotices(String noticeMsg) {
         JLabel noticeLb = new JLabel(noticeMsg);
         noticeLb.setHorizontalAlignment(JLabel.CENTER);
         noticeLb.setBounds(10, nextMsgLocation, 340, 20);
@@ -275,8 +270,6 @@ public class ChatUI2 extends JFrame {
 
         Main2.lastSpeakerID = -1;
         nextMsgLocation += 25;
-
-        refresh();
 
         SwingUtilities.invokeLater(() -> {
             if (nextMsgLocation >= 435) {
@@ -290,11 +283,13 @@ public class ChatUI2 extends JFrame {
             });
             return;
         });
+
+        refresh();
     }
 
-    static void showMessage(String sendName, String sendMsg, int sendID) {
+    void showMessage(String sendName, String sendMsg, int sendID) {
         if (viewMode) { // 채팅창 표시하기
-            sync.start("view");
+            viewMembers();
         }
 
         int height = 20;

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class Main2 {
+    ChatUI2 ui = new ChatUI2();
+
     private static Socket socket = null;
     private static BufferedReader in;
     private static PrintWriter out;
@@ -22,7 +24,6 @@ public class Main2 {
     static volatile boolean added = false;
 
     private Main2() {
-        new ChatUI2();
         setNickname();
     }
 
@@ -124,7 +125,6 @@ public class Main2 {
                 nameWriter.println(userName);
                 nameWriter.close();
 
-                ChatUI2.refresh();
                 return;
 
             } catch (Exception e) {
@@ -254,20 +254,20 @@ public class Main2 {
                 lastSpeakerID = -1;
             }
 
-            ChatUI2.refresh();
+            ui.refresh();
             return;
         }
 
         if (input.indexOf(';') == -1) {
             if (input.indexOf('@') == 0) {
-                ChatUI2.showNotices(input.substring(1));
+                ui.showNotices(input.substring(1));
             }
         } else {
             String sendName = input.substring(0, input.indexOf(';'));
             String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
-            ChatUI2.showMessage(sendName, sendMsg, sendID);
+            ui.showMessage(sendName, sendMsg, sendID);
         }
     }
 
@@ -277,10 +277,10 @@ public class Main2 {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            Main2 main2 = new Main2();
+            Main2 main = new Main2();
 
             while (in != null) {
-                main2.readMessage(in.readLine());
+                main.readMessage(in.readLine());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
