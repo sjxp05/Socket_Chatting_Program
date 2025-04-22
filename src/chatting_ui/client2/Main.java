@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 public class Main {
-    ChatUI ui = new ChatUI();
+    static ChatUI ui = new ChatUI();
 
     private static Socket socket = null;
     private static BufferedReader in;
@@ -63,7 +63,7 @@ public class Main {
 
         SetNickname: while (true) {
             try {
-                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+                userName = JOptionPane.showInputDialog(ui, nickNameMsg).strip();
             } catch (Exception e) {
                 System.exit(1);
             }
@@ -105,7 +105,7 @@ public class Main {
         ChangeNickname: while (true) {
             String newName;
             try {
-                newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+                newName = JOptionPane.showInputDialog(ui, nickNameMsg, userName).strip();
             } catch (Exception e) {
                 return;
             }

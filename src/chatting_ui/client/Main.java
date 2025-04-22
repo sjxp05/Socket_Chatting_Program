@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 
 // 클라이언트 메인(로직) 클래스
 public class Main {
-    ChatUI ui = new ChatUI(); // UI 객체 생성
+    static ChatUI ui = new ChatUI(); // UI 객체 생성
     /*
      * UI를 Main 내부에서 객체로 불러와야 하는 이유!
      * 
@@ -88,7 +88,7 @@ public class Main {
 
         SetNickname: while (true) {
             try {
-                userName = JOptionPane.showInputDialog(nickNameMsg).strip();
+                userName = JOptionPane.showInputDialog(ui, nickNameMsg).strip();
             } catch (Exception e) {
                 System.exit(1);
             }
@@ -133,7 +133,7 @@ public class Main {
         ChangeNickname: while (true) {
             String newName;
             try {
-                newName = JOptionPane.showInputDialog(nickNameMsg, userName).strip();
+                newName = JOptionPane.showInputDialog(ui, nickNameMsg, userName).strip();
             } catch (Exception e) {
                 return;
             }
