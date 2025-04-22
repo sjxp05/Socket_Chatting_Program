@@ -84,7 +84,7 @@ public class Main {
         }
 
         // 새로운 닉네임이 필요할 경우
-        String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
+        String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.\n ";
         int messageType = 3; // 안내 메시지의 아이콘 종류 결정
 
         SetNickname: while (true) {
@@ -95,13 +95,13 @@ public class Main {
             }
 
             if (userName.length() == 0 || userName.length() > 15) { // 길이제한
-                nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2; // 메시지 아이콘을 '경고'로 바꾸기
                 continue SetNickname;
             }
 
             if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) { // 기호제한
-                nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                nickNameMsg = "닉네임에는 ';'나 '@' 기호를\n사용할 수 없습니다.";
                 messageType = 2;
                 continue SetNickname;
             }
@@ -131,7 +131,7 @@ public class Main {
 
     // 닉네임 변경
     static void changeNickname() {
-        String nickNameMsg = "변경할 닉네임을 입력해 주세요.";
+        String nickNameMsg = "변경할 닉네임을 입력해 주세요.\n ";
         int messageType = 3;
 
         ChangeNickname: while (true) {
@@ -150,13 +150,13 @@ public class Main {
             }
 
             if (newName.length() == 0 || newName.length() > 15) { // 길이제한
-                nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2;
                 continue ChangeNickname;
             }
 
             if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) { // 기호제한
-                nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                nickNameMsg = "닉네임에는 ';'나 '@' 기호를\n사용할 수 없습니다.";
                 messageType = 2;
                 continue ChangeNickname;
             }
