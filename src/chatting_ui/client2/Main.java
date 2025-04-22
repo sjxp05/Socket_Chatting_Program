@@ -13,8 +13,8 @@ public class Main {
     private static BufferedReader in;
     private static PrintWriter out;
 
-    private static String userHome = System.getProperty("user.home");
-    private static File saveFile = new File(userHome, "chat-client2-info.txt");
+    private static final File saveFolder = new File(System.getProperty("user.home") + "/chatclient2/");
+    private static final File saveFile = new File(saveFolder, "chat-client2-info.txt");
 
     static ArrayList<String> nameList = new ArrayList<>();
 
@@ -28,6 +28,14 @@ public class Main {
     }
 
     void setNickname() {
+        if (!saveFolder.exists()) {
+            try {
+                saveFolder.mkdir();
+            } catch (Exception e) {
+                System.exit(1);
+            }
+        }
+
         if (saveFile.exists()) {
             try {
                 BufferedReader nameReader = new BufferedReader(new FileReader(saveFile));

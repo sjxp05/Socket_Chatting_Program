@@ -29,8 +29,8 @@ public class Main {
     private static PrintWriter out;
 
     // 사용자 정보 저장할 파일 위치
-    private static String userHome = System.getProperty("user.home");
-    private static File saveFile = new File(userHome, "chat-client-info.txt");
+    private static final File saveFolder = new File(System.getProperty("user.home") + "/chatclient/");
+    private static final File saveFile = new File(saveFolder, "chat-client-info.txt");
 
     // 유저목록 보기 기능을 위한 사용자 닉네임 리스트
     static ArrayList<String> nameList = new ArrayList<>();
@@ -52,6 +52,14 @@ public class Main {
 
     // 처음 시작할 때 닉네임 설정하기
     void setNickname() {
+        if (!saveFolder.exists()) { // 폴더가 존재하지 않을 때
+            try {
+                saveFolder.mkdir();
+            } catch (Exception e) {
+                System.exit(1);
+            }
+        }
+
         if (saveFile.exists()) { // 파일이 존재할 경우 (사용 기록이 있어 닉네임이 이미 존재함)
             try { // 파일에서 원래 닉네임 읽어오기
                 BufferedReader nameReader = new BufferedReader(new FileReader(saveFile));

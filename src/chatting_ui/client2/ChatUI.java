@@ -315,7 +315,7 @@ public class ChatUI extends JFrame {
         if (sendID == Main.lastSpeakerID) {
             nextMsgLocation -= 10;
         } else {
-            nameLb.setBounds(0, nextMsgLocation, 340, 20);
+            nameLb.setBounds(10, nextMsgLocation, 330, 20);
             nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
             nameLb.setForeground(Color.GRAY);
             msgPanel.add(nameLb);
@@ -324,7 +324,7 @@ public class ChatUI extends JFrame {
             nextMsgLocation += 22;
         }
 
-        msgLb.setBounds(0, nextMsgLocation, 340, height);
+        msgLb.setBounds(10, nextMsgLocation, 330, height);
         msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
         msgPanel.add(msgLb);
         nextMsgLocation += (15 + height);

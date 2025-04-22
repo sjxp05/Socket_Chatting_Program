@@ -331,7 +331,7 @@ public class ChatUI extends JFrame {
         if (sendID == Main.lastSpeakerID) { // 직전에 말한 사람과 같을 경우 이름 표시하지 않음
             nextMsgLocation -= 10;
         } else { // 이름 표시 라벨 배치
-            nameLb.setBounds(0, nextMsgLocation, 340, 20);
+            nameLb.setBounds(10, nextMsgLocation, 330, 20);
             nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
             nameLb.setForeground(Color.GRAY);
             msgPanel.add(nameLb);
@@ -341,7 +341,7 @@ public class ChatUI extends JFrame {
         }
 
         // 메시지 라벨 배치
-        msgLb.setBounds(0, nextMsgLocation, 340, height);
+        msgLb.setBounds(10, nextMsgLocation, 330, height);
         msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
         msgPanel.add(msgLb);
         nextMsgLocation += (15 + height);

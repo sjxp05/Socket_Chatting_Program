@@ -9,15 +9,16 @@ public class Server {
     private static final ConcurrentHashMap<Integer, String> userInfo = new ConcurrentHashMap<>();
     private static int newUserID = 0;
 
-    private static String serverHome = System.getProperty("user.home");
-    private static File serverSaveFile = new File(serverHome, "last_id.txt");
+    private static String serverHome = System.getProperty("user.home"); // 사용자 폴더 위치 읽어오기
+    private static File serverFolder = new File(serverHome, "chatserver/"); // 폴더 위치 지정
+    private static File serverSaveFile = new File(serverFolder, "last_id.txt"); // 텍스트 파일 위치 지정
 
     // 닉네임 추가하기
     public static synchronized void addNickname(String userName) {
-        userInfo.putIfAbsent(newUserID, userName);
-        newUserID++;
+        userInfo.putIfAbsent(newUserID, userName); // 핸들러에게 요청받은 사용자의 아이디 및 닉네임을 리스트에 추가
+        newUserID++; // 다음 아이디 업데이트
 
-        try {
+        try { // 다음 아이디를 파일에 쓰기
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
             writer.println(newUserID);
             writer.close();
@@ -31,6 +32,7 @@ public class Server {
         userInfo.put(userID, userName);
     }
 
+    // 방을 나간 회원을 서버 리스트에서 삭제
     public static synchronized void removeNickname(int userID) {
         userInfo.remove(userID);
     }
@@ -42,15 +44,20 @@ public class Server {
 
     public static void main(String[] args) {
         try {
-            if (serverSaveFile.exists()) {
+            if (!serverFolder.exists()) { // 폴더가 존재하지 않을 시 새로 만들기
+                serverFolder.mkdir();
+            }
+
+            if (serverSaveFile.exists()) { // 파일이 존재할 경우
                 BufferedReader reader = new BufferedReader(new FileReader(serverSaveFile));
                 newUserID = Integer.parseInt(reader.readLine());
                 reader.close();
-            } else {
+            } else { // 파일이 존재하지 않을 경우(아이디를 0으로 초기화)
                 PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
                 writer.println("0");
                 writer.close();
             }
+
         } catch (Exception e) {
             System.exit(1);
         }
