@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 // 클라이언트 메인(로직) 클래스
 public class Main {
