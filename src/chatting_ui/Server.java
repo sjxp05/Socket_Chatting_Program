@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Server {
     // 닉네임 저장할때 필요한 동기화 자동으로 되는 해시맵
     private static final ConcurrentHashMap<Integer, String> userInfo = new ConcurrentHashMap<>();
-    private static int newUserID = 0;
+    private static int newUserID = 0; // 다음에 들어오는 사용자에게 부여할 고유 ID
 
     private static String serverHome = System.getProperty("user.home"); // 사용자 폴더 위치 읽어오기
     private static File serverFolder = new File(serverHome, "chatserver/"); // 폴더 위치 지정
@@ -50,7 +50,7 @@ public class Server {
 
             if (serverSaveFile.exists()) { // 파일이 존재할 경우
                 BufferedReader reader = new BufferedReader(new FileReader(serverSaveFile));
-                newUserID = Integer.parseInt(reader.readLine());
+                newUserID = Integer.parseInt(reader.readLine()); // 파일에 적혀 있는 번호가 다음 사용자 ID임
                 reader.close();
             } else { // 파일이 존재하지 않을 경우(아이디를 0으로 초기화)
                 PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
