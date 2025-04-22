@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class Main2 {
-    ChatUI2 ui = new ChatUI2();
+public class Main {
+    ChatUI ui = new ChatUI();
 
     private static Socket socket = null;
     private static BufferedReader in;
@@ -23,7 +23,7 @@ public class Main2 {
     static volatile int lastSpeakerID = -1;
     static volatile boolean added = false;
 
-    private Main2() {
+    private Main() {
         setNickname();
     }
 
@@ -235,31 +235,30 @@ public class Main2 {
     }
 
     synchronized void readMessage(String input) {
-        if (input.equals("@viewend")) {
-            added = true;
-            return;
-
-        } else if (input.indexOf("@view@") >= 0) {
-            String[] info = input.split("@");
-
-            if (Integer.parseInt(info[2]) != userID) {
-                nameList.add(info[0]);
-            }
-            return;
-
-        } else if (input.indexOf("@changed@") >= 0) {
-            int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
-
-            if (changedID == lastSpeakerID) {
-                lastSpeakerID = -1;
-            }
-
-            ui.refresh();
-            return;
-        }
-
         if (input.indexOf(';') == -1) {
-            if (input.indexOf('@') == 0) {
+            if (input.equals("@viewend")) {
+                added = true;
+                return;
+
+            } else if (input.indexOf("@view@") >= 0) {
+                String[] info = input.split("@");
+
+                if (Integer.parseInt(info[2]) != userID) {
+                    nameList.add(info[0]);
+                }
+                return;
+
+            } else if (input.indexOf("@changed@") >= 0) {
+                int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
+
+                if (changedID == lastSpeakerID) {
+                    lastSpeakerID = -1;
+                }
+
+                ui.refresh();
+                return;
+
+            } else if (input.indexOf('@') == 0) {
                 ui.showNotices(input.substring(1));
             }
         } else {
@@ -277,7 +276,7 @@ public class Main2 {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            Main2 main = new Main2();
+            Main main = new Main();
 
             while (in != null) {
                 main.readMessage(in.readLine());

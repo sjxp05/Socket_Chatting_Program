@@ -271,31 +271,30 @@ public class Main {
 
     // 실시간으로 서버로부터 메시지 읽기
     synchronized void readMessage(String input) {
-        if (input.equals("@viewend")) { // 사용자 목록을 다 확인했을 경우
-            added = true; // viewRequest() 안의 무한루프를 멈춰줌
-            return;
-
-        } else if (input.indexOf("@view@") >= 0) { // 사용자 목록 받기
-            String[] info = input.split("@");
-
-            if (Integer.parseInt(info[2]) != userID) { // 본인이 아닌 경우 목록에 넣기
-                nameList.add(info[0]);
-            }
-            return;
-
-        } else if (input.indexOf("@changed@") >= 0) { // 본인 포함 유저의 아이디가 바뀐 경우
-            int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
-
-            if (changedID == lastSpeakerID) { // 다음 메시지부터는 바뀐 닉네임으로 뜨도록 수정
-                lastSpeakerID = -1;
-            }
-
-            ui.refresh(); // 만약 viewmode 켜진 상태이면 목록 새로고침
-            return;
-        }
-
         if (input.indexOf(';') == -1) { // 사용자 메시지가 아닐 경우
-            if (input.indexOf('@') == 0) { // 사용자 입장/퇴장 메시지의 경우
+            if (input.equals("@viewend")) { // 사용자 목록을 다 확인했을 경우
+                added = true; // viewRequest() 안의 무한루프를 멈춰줌
+                return;
+
+            } else if (input.indexOf("@view@") >= 0) { // 사용자 목록 받기
+                String[] info = input.split("@");
+
+                if (Integer.parseInt(info[2]) != userID) { // 본인이 아닌 경우 목록에 넣기
+                    nameList.add(info[0]);
+                }
+                return;
+
+            } else if (input.indexOf("@changed@") >= 0) { // 본인 포함 유저의 아이디가 바뀐 경우
+                int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
+
+                if (changedID == lastSpeakerID) { // 다음 메시지부터는 바뀐 닉네임으로 뜨도록 수정
+                    lastSpeakerID = -1;
+                }
+
+                ui.refresh(); // 만약 viewmode 켜진 상태이면 목록 새로고침
+                return;
+
+            } else if (input.indexOf('@') == 0) { // 사용자 입장/퇴장 메시지의 경우
                 ui.showNotices(input.substring(1)); // 채팅창 가운데로 안내 메시지 표시
             }
         } else { // 사용자가 직접 보낸 메시지일 경우

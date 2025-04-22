@@ -172,7 +172,7 @@ public class ChatUI extends JFrame {
                 shiftPressed = true;
             }
 
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {// 쉬프트와 엔터키(and/or) 눌린 상태일때
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
 
@@ -224,7 +224,7 @@ public class ChatUI extends JFrame {
             nextMemberLocation += 50;
 
             membersPanel.add(nickChangeBt); // 닉변버튼 표시
-            membersPanel.setComponentZOrder(nickChangeBt, 0);// 라벨 위에 표시되도록 맨 위로 올려주기
+            membersPanel.setComponentZOrder(nickChangeBt, 0); // 라벨 위에 표시되도록 맨 위로 올려주기
 
             // 다른 참여자 목록 표시, 라벨로 모두 추가
             for (String name : Main.nameList) {

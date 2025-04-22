@@ -8,7 +8,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
-public class ChatUI2 extends JFrame {
+public class ChatUI extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방");
     JButton sendBt = new JButton("전송");
     JButton exitBt = new JButton("나가기");
@@ -23,15 +23,13 @@ public class ChatUI2 extends JFrame {
     JScrollPane memScroll = new JScrollPane(membersPanel);
     JButton nickChangeBt = new JButton("이름 변경");
 
-    private SyncOnUpdate sync;
+    private SyncOnUpdate sync = new SyncOnUpdate();
 
     private volatile boolean shiftPressed = false;
     private volatile boolean viewMode = false;
     private volatile int nextMsgLocation = 10;
 
-    ChatUI2() {
-        sync = this.new SyncOnUpdate();
-
+    ChatUI() {
         setTitle("New Chat");
         setSize(400, 600);
         setResizable(false);
@@ -149,7 +147,7 @@ public class ChatUI2 extends JFrame {
                     if (option.equals("send")) {
                         writeMessage();
                     } else if (option.equals("change")) {
-                        Main2.changeNickname();
+                        Main.changeNickname();
                     } else if (option.equals("view")) {
                         viewMembers();
                     }
@@ -205,11 +203,11 @@ public class ChatUI2 extends JFrame {
         } else {
             viewMode = true;
             membersBt.setText("채팅");
-            Main2.viewRequest();
+            Main.viewRequest();
 
             int nextMemberLocation = 10;
 
-            JLabel myLb = new JLabel("      " + Main2.userName);
+            JLabel myLb = new JLabel("      " + Main.userName);
             myLb.setFont(new Font("Sans Serif", Font.BOLD, 15));
             myLb.setOpaque(true);
             myLb.setBackground(new Color(245, 240, 190));
@@ -221,7 +219,7 @@ public class ChatUI2 extends JFrame {
             membersPanel.add(nickChangeBt);
             membersPanel.setComponentZOrder(nickChangeBt, 0);
 
-            for (String name : Main2.nameList) {
+            for (String name : Main.nameList) {
                 JLabel nameLb = new JLabel("      " + name);
                 nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
                 nameLb.setOpaque(true);
@@ -257,7 +255,7 @@ public class ChatUI2 extends JFrame {
             textInput.requestFocus();
         });
 
-        Main2.sendMessage(msg);
+        Main.sendMessage(msg);
     }
 
     void showNotices(String noticeMsg) {
@@ -268,7 +266,7 @@ public class ChatUI2 extends JFrame {
         noticeLb.setForeground(Color.GRAY);
         msgPanel.add(noticeLb);
 
-        Main2.lastSpeakerID = -1;
+        Main.lastSpeakerID = -1;
         nextMsgLocation += 25;
 
         SwingUtilities.invokeLater(() -> {
@@ -288,7 +286,7 @@ public class ChatUI2 extends JFrame {
     }
 
     void showMessage(String sendName, String sendMsg, int sendID) {
-        if (viewMode) { // 채팅창 표시하기
+        if (viewMode) {
             viewMembers();
         }
 
@@ -306,7 +304,7 @@ public class ChatUI2 extends JFrame {
         JLabel nameLb = new JLabel(sendName);
         JLabel msgLb = new JLabel(sendMsg);
 
-        if (sendID == Main2.userID) {
+        if (sendID == Main.userID) {
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setHorizontalAlignment(JLabel.RIGHT);
         } else {
@@ -314,7 +312,7 @@ public class ChatUI2 extends JFrame {
             msgLb.setHorizontalAlignment(JLabel.LEFT);
         }
 
-        if (sendID == Main2.lastSpeakerID) {
+        if (sendID == Main.lastSpeakerID) {
             nextMsgLocation -= 10;
         } else {
             nameLb.setBounds(0, nextMsgLocation, 340, 20);
@@ -322,7 +320,7 @@ public class ChatUI2 extends JFrame {
             nameLb.setForeground(Color.GRAY);
             msgPanel.add(nameLb);
 
-            Main2.lastSpeakerID = sendID;
+            Main.lastSpeakerID = sendID;
             nextMsgLocation += 22;
         }
 
