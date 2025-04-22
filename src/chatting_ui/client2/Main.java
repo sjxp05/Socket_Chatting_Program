@@ -60,21 +60,24 @@ public class Main {
         }
 
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
+        int messageType = 3;
 
         SetNickname: while (true) {
             try {
-                userName = JOptionPane.showInputDialog(ui, nickNameMsg).strip();
+                userName = JOptionPane.showInputDialog(ui, nickNameMsg, "닉네임 설정", messageType).strip();
             } catch (Exception e) {
                 System.exit(1);
             }
 
             if (userName.length() == 0 || userName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                messageType = 2;
                 continue SetNickname;
             }
 
             if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                messageType = 2;
                 continue SetNickname;
             }
 
@@ -101,11 +104,15 @@ public class Main {
 
     static void changeNickname() {
         String nickNameMsg = "변경할 닉네임을 입력해 주세요.";
+        int messageType = 3;
 
         ChangeNickname: while (true) {
             String newName;
             try {
-                newName = JOptionPane.showInputDialog(ui, nickNameMsg, userName).strip();
+                newName = JOptionPane
+                        .showInputDialog(ui, nickNameMsg, "닉네임 변경", messageType,
+                                null, null, userName)
+                        .toString().strip();
             } catch (Exception e) {
                 return;
             }
@@ -116,11 +123,13 @@ public class Main {
 
             if (newName.length() == 0 || newName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                messageType = 2;
                 continue ChangeNickname;
             }
 
             if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                messageType = 2;
                 continue ChangeNickname;
             }
 

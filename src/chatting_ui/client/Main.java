@@ -85,21 +85,24 @@ public class Main {
 
         // 새로운 닉네임이 필요할 경우
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.";
+        int messageType = 3; // 안내 메시지의 아이콘 종류 결정
 
         SetNickname: while (true) {
             try {
-                userName = JOptionPane.showInputDialog(ui, nickNameMsg).strip();
+                userName = JOptionPane.showInputDialog(ui, nickNameMsg, "닉네임 설정", messageType).strip();
             } catch (Exception e) {
                 System.exit(1);
             }
 
             if (userName.length() == 0 || userName.length() > 15) { // 길이제한
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                messageType = 2; // 메시지 아이콘을 '경고'로 바꾸기
                 continue SetNickname;
             }
 
             if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) { // 기호제한
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                messageType = 2;
                 continue SetNickname;
             }
 
@@ -129,11 +132,15 @@ public class Main {
     // 닉네임 변경
     static void changeNickname() {
         String nickNameMsg = "변경할 닉네임을 입력해 주세요.";
+        int messageType = 3;
 
         ChangeNickname: while (true) {
             String newName;
             try {
-                newName = JOptionPane.showInputDialog(ui, nickNameMsg, userName).strip();
+                newName = JOptionPane
+                        .showInputDialog(ui, nickNameMsg, "닉네임 변경", messageType,
+                                null, null, userName)
+                        .toString().strip();
             } catch (Exception e) {
                 return;
             }
@@ -144,11 +151,13 @@ public class Main {
 
             if (newName.length() == 0 || newName.length() > 15) { // 길이제한
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.";
+                messageType = 2;
                 continue ChangeNickname;
             }
 
             if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) { // 기호제한
                 nickNameMsg = "닉네임에는 ';'나 '@' 기호를 사용할 수 없습니다.";
+                messageType = 2;
                 continue ChangeNickname;
             }
 
