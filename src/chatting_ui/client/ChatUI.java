@@ -175,9 +175,10 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
+                    currentTxt.append("\n");
 
                     SwingUtilities.invokeLater(() -> {
-                        textInput.setText(currentTxt + "\n");
+                        textInput.setText(currentTxt.toString());
                         textInput.requestFocus();
                     });
                 } else { // 쉬프트키 없이 단독: 전송
