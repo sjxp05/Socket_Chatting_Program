@@ -2,6 +2,7 @@ package chatting_ui;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +21,8 @@ public class Handler extends Thread {
         try {
             // 소켓 받아서 i/o 스트림 지정
             socket = clientSocket;
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
             writerList.add(out);
             userID = newUserID;
         } catch (Exception e) {

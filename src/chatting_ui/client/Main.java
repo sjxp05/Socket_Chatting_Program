@@ -2,6 +2,7 @@ package chatting_ui.client;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -203,16 +204,17 @@ public class Main {
         // html로 바꿀 때 문자를 빠르게 추가하는 용도의 스트링버퍼
         StringBuffer htmlText = new StringBuffer("<html><body>");
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
+        int strLength = msg.codePointCount(0, msg.length());
 
-        for (int i = 0; i < msg.length(); i++) {
-            if ((int) msg.charAt(i) < 128) { // 영어 알파벳 또는 기본 기호일 경우
+        for (int i = 0; i < strLength; i++) {
+            if ((int) msg.codePointAt(i) < 128) { // 영어 알파벳 또는 기본 기호일 경우
                 wordCount++;
             } else { // 한글 등 가로 길이가 긴 경우
                 wordCount += 2;
             }
 
             // html에 들어갈 수 있는 문자로 변환
-            switch (msg.charAt(i)) {
+            switch (msg.codePointAt(i)) {
                 case ' ':
                     htmlText.append("&nbsp;");
                     break;
@@ -275,7 +277,7 @@ public class Main {
             }
 
             if (wordCount >= 40) {
-                if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
+                if (i < strLength - 1 && msg.codePointAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
                     htmlText.append("<br>");
                 }
                 wordCount = 0;
@@ -328,8 +330,8 @@ public class Main {
         try {
             // 소켓 연결
             socket = new Socket("localhost", 12345);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
             Main main = new Main();
 

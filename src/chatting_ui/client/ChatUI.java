@@ -175,9 +175,10 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
+                    currentTxt.append("\n");
 
                     SwingUtilities.invokeLater(() -> {
-                        textInput.setText(currentTxt + "\n");
+                        textInput.setText(currentTxt.toString());
                         textInput.requestFocus();
                     });
                 } else { // 쉬프트키 없이 단독: 전송
@@ -332,7 +333,7 @@ public class ChatUI extends JFrame {
             nextMsgLocation -= 10;
         } else { // 이름 표시 라벨 배치
             nameLb.setBounds(10, nextMsgLocation, 330, 20);
-            nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
+            nameLb.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
             nameLb.setForeground(Color.GRAY);
             msgPanel.add(nameLb);
 
@@ -342,7 +343,7 @@ public class ChatUI extends JFrame {
 
         // 메시지 라벨 배치
         msgLb.setBounds(10, nextMsgLocation, 330, height);
-        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        msgLb.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 15));
         msgPanel.add(msgLb);
         nextMsgLocation += (15 + height);
 
