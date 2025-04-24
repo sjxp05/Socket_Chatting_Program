@@ -207,6 +207,10 @@ public class Main {
         int strLength = msg.codePointCount(0, msg.length());
 
         for (int i = 0; i < strLength; i++) {
+            // test
+            System.out.println(strLength);
+            System.out.println((int) msg.codePointAt(i) + " : " + msg.codePointAt(i));
+
             if ((int) msg.codePointAt(i) < 128) { // 영어 알파벳 또는 기본 기호일 경우
                 wordCount++;
             } else { // 한글 등 가로 길이가 긴 경우
@@ -321,6 +325,9 @@ public class Main {
             String sendName = input.substring(0, input.indexOf(';'));
             String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
+
+            // test
+            System.out.println(sendMsg);
 
             ui.showMessage(sendName, sendMsg, sendID); // 채팅창에 사용자이름+메시지 띄우기
         }
