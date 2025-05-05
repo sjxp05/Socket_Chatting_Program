@@ -283,7 +283,18 @@ public class Main {
             String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
-            ui.showMessage(sendName, sendMsg, sendID);
+            int height = 20;
+            int lines = 1;
+
+            for (int i = 12; i < sendMsg.length(); i++) {
+                if (sendMsg.indexOf("<br>", i) >= 0) {
+                    height += (21 + lines / 4);
+                    lines++;
+                    i = sendMsg.indexOf("<br>", i) + 4;
+                }
+            }
+
+            ui.showMessage(sendName, sendMsg, sendID, height);
         }
     }
 
@@ -300,6 +311,7 @@ public class Main {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
+            System.exit(1);
         }
     }
 }
