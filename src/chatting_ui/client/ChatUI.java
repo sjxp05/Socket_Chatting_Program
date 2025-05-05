@@ -20,6 +20,7 @@ public class ChatUI extends JFrame {
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
     JScrollPane scroll = new JScrollPane(msgPanel); // 메시지창을 넣은 스크롤페인
     JTextPane textInput = new JTextPane(); // 메시지 입력 칸
+    StyledDocument doc = textInput.getStyledDocument(); // html 문서를 편집하기 위한 클래스
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
     JButton membersBt = new JButton("참여자"); // 유저 목록 보기/채팅창 돌아가기 버튼
@@ -120,7 +121,6 @@ public class ChatUI extends JFrame {
             textInput.requestFocus();
             textInput.addKeyListener(new PressEnter()); // 텍스트창에서 shift 또는 enter 키를 누를 시 작동함
 
-            StyledDocument doc = textInput.getStyledDocument();
             SimpleAttributeSet left = new SimpleAttributeSet();
 
             StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
@@ -190,16 +190,12 @@ public class ChatUI extends JFrame {
 
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
-                    StringBuffer currentTxt = new StringBuffer(textInput.getText());
-                    // currentTxt.insert(currentTxt.lastIndexOf("</p>") - 4, "<br>");
-                    // currentTxt.replace(currentTxt.lastIndexOf("\">") + 1,
-                    // currentTxt.lastIndexOf("</p>"), "<br>");
                     // 줄바꿈 ㄹㅇ어케함?
+                    try {
+                        doc.insertString(doc.getLength(), "<br>", null);
+                    } catch (Exception ex) {
+                    }
 
-                    SwingUtilities.invokeLater(() -> {
-                        textInput.setText(currentTxt.toString());
-                        textInput.requestFocus();
-                    });
                 } else { // 쉬프트키 없이 단독: 전송
                     sync.start("send");
                 }
@@ -208,19 +204,22 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_V) {
                 if (copied) {
                     SwingUtilities.invokeLater(() -> {
-
-                        StyledDocument doc = textInput.getStyledDocument();
                         SimpleAttributeSet left = new SimpleAttributeSet();
-
                         StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+
                         doc.setParagraphAttributes(0, doc.getLength(), left, false);
 
-                        SwingUtilities.invokeLater(() -> {
-                            textInput.repaint();
-                        });
+                        // SwingUtilities.invokeLater(() -> {
+                        // textInput.repaint();
+                        // });
                     });
                 }
             }
+
+            SwingUtilities.invokeLater(() -> {
+                textScroll.getVerticalScrollBar().setValue(textScroll.getVerticalScrollBar().getMaximum());
+                textInput.requestFocus();
+            });
         }
 
         @Override
