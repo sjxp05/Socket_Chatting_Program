@@ -201,7 +201,7 @@ public class Main {
         }
 
         // html로 바꿀 때 문자를 빠르게 추가하는 용도의 스트링버퍼
-        StringBuffer htmlText = new StringBuffer("<html><body>");
+        StringBuffer htmlText = new StringBuffer("");
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
 
         for (int i = 0; i < msg.length(); i++) {
@@ -281,7 +281,6 @@ public class Main {
                 wordCount = 0;
             }
         }
-        htmlText.append("</body></html>");
 
         out.println(userName + ";" + htmlText + ';' + userID); // 서버로 전송
     }
@@ -324,7 +323,7 @@ public class Main {
             int height = 20;
             int lines = 1;
 
-            for (int i = 12; i < sendMsg.length(); i++) {
+            for (int i = 0; i < sendMsg.length(); i++) {
                 if (sendMsg.indexOf("<br>", i) >= 0) {
                     height += (21 + lines / 4);
                     lines++;
