@@ -8,6 +8,13 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel; // ⚠️ 이게 바로 Swing 안에 JavaFX 박아주는 컴포넌트
+import javafx.scene.Scene;
+import javafx.scene.web.WebView; // 웹 렌더링 컴포넌트
+import javafx.scene.web.WebEngine;
+// 라고 하네요 지피티가....
+
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방"); // 방 이름 라벨
@@ -16,7 +23,10 @@ public class ChatUI extends JFrame {
 
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
     JScrollPane scroll = new JScrollPane(msgPanel); // 메시지창을 넣은 스크롤페인
+
+    /* 여기를 수정해야됨!!! */
     JTextArea textInput = new JTextArea(); // 메시지 입력 칸
+    /* */
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
     JButton membersBt = new JButton("참여자"); // 유저 목록 보기/채팅창 돌아가기 버튼
@@ -307,14 +317,21 @@ public class ChatUI extends JFrame {
         }
 
         JLabel nameLb = new JLabel(sendName); // 메시지 보낸 사용자 이름 라벨
-        JLabel msgLb = new JLabel(sendMsg); // 전송된 메시지 표시 라벨
+        JTextPane msgLb = new JTextPane(); // 전송된 메시지 표시 라벨
+        msgLb.setContentType("text/html");
+        msgLb.setEditable(false);
+        msgLb.setOpaque(false);
 
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
-            msgLb.setHorizontalAlignment(JLabel.RIGHT);
+            msgLb.setText(
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: right;'>" + sendMsg +
+                            "</body></html>");
         } else { // 본인 외 다른 상대방의 메시지: 왼쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.LEFT);
-            msgLb.setHorizontalAlignment(JLabel.LEFT);
+            msgLb.setText(
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: left;'>" + sendMsg +
+                            "</body></html>");
         }
 
         if (sendID == Main.lastSpeakerID) { // 직전에 말한 사람과 같을 경우 이름 표시하지 않음
@@ -331,7 +348,6 @@ public class ChatUI extends JFrame {
 
         // 메시지 라벨 배치
         msgLb.setBounds(10, nextMsgLocation, 330, height);
-        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
         msgPanel.add(msgLb);
         nextMsgLocation += (15 + height);
 
