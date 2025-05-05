@@ -196,6 +196,8 @@ public class Main {
 
     // 서버로 사용자의 메시지 보내주기 (줄바꿈 가능한 html 형태로)
     static void sendMessage(String msg) {
+        msg = msg.substring(msg.indexOf("<p style=\"margin-top: 0\">") + 25, msg.lastIndexOf("</p>")).strip();
+
         if (msg.length() == 0) { // 공백만 보내지 않기
             return;
         }
@@ -205,83 +207,35 @@ public class Main {
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
 
         for (int i = 0; i < msg.length(); i++) {
-            if ((int) msg.charAt(i) < 128) { // 영어 알파벳 또는 기본 기호일 경우
+            if (msg.charAt(i) >= 'A' && msg.charAt(i) <= 'Z') { // 영어 대문자일 경우
                 wordCount++;
-            } else { // 한글 등 가로 길이가 긴 경우
+            } else if (msg.charAt(i) >= 'a' && msg.charAt(i) <= 'z') {// 영어 소문자
+                wordCount++;
+            } else if (msg.charAt(i) == '&') {
                 wordCount += 2;
+            } else if ((int) msg.charAt(i) < 128) { // 숫자/기본기호/한글 나타내는 태그일 경우
+                wordCount++;
             }
 
-            // html에 들어갈 수 있는 문자로 변환
-            switch (msg.charAt(i)) {
-                case ' ':
-                    htmlText.append("&nbsp;");
-                    break;
-
-                case '\n':
-                    // 메시지 마지막에 개행 문자가 있을 경우 무시
-                    if (i < msg.length() - 1) { // 마지막이 아닐 경우에는 넣기
-                        htmlText.append("<br>");
-                    }
-                    wordCount = 0;
-                    break;
-
-                case '\"':
-                    htmlText.append("&quot;");
-                    break;
-
-                case '&':
-                    htmlText.append("&amp;");
-                    break;
-
-                case '<':
-                    htmlText.append("&lt;");
-                    break;
-
-                case '>':
-                    htmlText.append("&gt;");
-                    break;
-
-                case '÷':
-                    htmlText.append("&divide;");
-                    break;
-
-                case '®':
-                    htmlText.append("&reg;");
-                    break;
-
-                case '·':
-                    htmlText.append("&middot;");
-                    break;
-
-                case '±':
-                    htmlText.append("&plusmn;");
-                    break;
-
-                case 'ⓒ':
-                    htmlText.append("&copy;");
-                    break;
-
-                case '°':
-                    htmlText.append("&deg;");
-                    break;
-
-                case '×':
-                    htmlText.append("&times;");
-                    break;
-
-                default:
-                    htmlText.append(msg.charAt(i));
-                    break;
-            }
-
-            if (wordCount >= 40) {
-                if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
-                    htmlText.append("<br>");
-                }
+            if (i == msg.indexOf("<br>", i)) {
+                htmlText.append("<br>");
                 wordCount = 0;
+                i += 4;
+                continue;
             }
+
+            htmlText.append(msg.charAt(i));
+
+            // if (wordCount >= 40) {
+            // if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만
+            // 줄바꿈
+            // htmlText.append("<br>");
+            // }
+            // wordCount = 0;
+            // }
         }
 
+        System.out.println(htmlText);
         out.println(userName + ";" + htmlText + ';' + userID); // 서버로 전송
     }
 

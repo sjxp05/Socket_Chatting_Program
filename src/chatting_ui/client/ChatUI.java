@@ -16,7 +16,7 @@ public class ChatUI extends JFrame {
 
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
     JScrollPane scroll = new JScrollPane(msgPanel); // 메시지창을 넣은 스크롤페인
-    JTextArea textInput = new JTextArea(); // 메시지 입력 칸
+    JTextPane textInput = new JTextPane(); // 메시지 입력 칸
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
     JButton membersBt = new JButton("참여자"); // 유저 목록 보기/채팅창 돌아가기 버튼
@@ -94,12 +94,6 @@ public class ChatUI extends JFrame {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         pane.add(scroll);
 
-        textInput.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 15));
-        textInput.setBounds(0, 0, 290, 50);
-        textInput.setLineWrap(true);
-        textInput.requestFocus();
-        textInput.addKeyListener(new PressEnter()); // 텍스트창에서 shift 또는 enter 키를 누를 시 작동함
-
         textScroll.setBounds(10, 500, 290, 50);
         textScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         textScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -114,6 +108,14 @@ public class ChatUI extends JFrame {
             }
         });
         pane.add(sendBt);
+
+        SwingUtilities.invokeLater(() -> {
+            textInput.setContentType("text/html");
+            textInput.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 15)); // 삭제예정
+            textInput.setBounds(0, 0, 290, 50);
+            textInput.requestFocus();
+            textInput.addKeyListener(new PressEnter()); // 텍스트창에서 shift 또는 enter 키를 누를 시 작동함
+        });
 
         setVisible(true);
     }
@@ -262,6 +264,10 @@ public class ChatUI extends JFrame {
     // 텍스트창에 입력된 메시지를 메인함수로 보내주기
     void writeMessage() {
         String msg = textInput.getText().strip();
+
+        // test
+        // System.out.println(msg);
+
         SwingUtilities.invokeLater(() -> { // 텍스트 입력창 비우기
             textInput.setText("");
             textInput.requestFocus();
