@@ -196,7 +196,14 @@ public class Main {
 
     // 서버로 사용자의 메시지 보내주기 (줄바꿈 가능한 html 형태로)
     static void sendMessage(String msg) {
-        msg = msg.substring(msg.indexOf("<p style=\"margin-top: 0\">") + 25, msg.lastIndexOf("</p>")).strip();
+        try {
+            msg = msg.substring(msg.indexOf("<p align=\"left\" style=\"margin-top: 0\">") + 38,
+                    msg.lastIndexOf("\n    </p>"));
+        } catch (Exception e) {
+            msg = msg.substring(msg.indexOf("<body align=\"right\">") + 20, msg.lastIndexOf("\n  </body>"));
+        } finally {
+            msg = msg.strip();
+        }
 
         if (msg.length() == 0) { // 공백만 보내지 않기
             return;
@@ -207,17 +214,26 @@ public class Main {
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
         boolean isSpecialLetter = false; // 한 글자로 취급하는지
 
+        System.out.println(msg.length());
+
         for (int i = 0; i < msg.length(); i++) {
+            if (msg.charAt(i) == '\n') { // 수정필요
+                while (true) {
+                    i++;
+                    if (msg.charAt(i) != ' ' && msg.charAt(i) != '\t') {
+                        i--;
+                        break;
+                    }
+                }
+                continue;
+            }
+
             if (msg.charAt(i) == '&') {
                 isSpecialLetter = true;
             }
 
             if (!isSpecialLetter) {
-                if ((int) msg.charAt(i) < 128) {
-                    wordCount += 2;
-                } else {
-                    wordCount += 3;
-                }
+                wordCount++; // 이걸 a~z를 1~3사이의 값으로 다양화해보는 시도 예정
             }
 
             if (isSpecialLetter && msg.charAt(i) == ';') {
@@ -226,23 +242,25 @@ public class Main {
             }
 
             if (i == msg.indexOf("<br>", i)) {
-                htmlText.append("<br>");
+                if (i < msg.length() - 4) {
+                    htmlText.append("<br>");
+                }
                 wordCount = 0;
-                i += 4;
+                i += 3;
                 continue;
             }
 
             htmlText.append(msg.charAt(i));
 
             if (wordCount >= 60) {
-                if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
+                if (i < msg.length() - 1) { // 마지막 줄이 아닐 경우에만 줄바꿈
                     htmlText.append("<br>");
                 }
                 wordCount = 0;
             }
         }
 
-        System.out.println(htmlText);
+        System.out.println(htmlText); // test
         out.println(userName + ";" + htmlText + ';' + userID); // 서버로 전송
     }
 
@@ -281,14 +299,14 @@ public class Main {
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
             // 메시지의 줄 개수를 세서 라벨의 세로 길이 설정
-            int height = 22;
-            int lines = 1;
+            int height = 21;
+            // int lines = 1;
 
             for (int i = 0; i < sendMsg.length(); i++) {
-                if (sendMsg.indexOf("<br>", i) >= 0) {
-                    height += (21 + lines / 4);
-                    lines++;
-                    i = sendMsg.indexOf("<br>", i) + 4;
+                if (i == sendMsg.indexOf("<br>", i)) {
+                    height += 21;
+                    // lines++;
+                    i += 3;
                 }
             }
 

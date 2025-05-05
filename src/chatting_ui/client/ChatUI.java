@@ -7,6 +7,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
@@ -27,6 +30,7 @@ public class ChatUI extends JFrame {
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
 
     private volatile boolean shiftPressed = false; // 쉬프트키 눌렀는지 여부
+    private volatile boolean copied = false; // 복붙 동작 여부
     private volatile boolean viewMode = false; // 유저 목록 보기가 켜져 있는지
     private volatile int nextMsgLocation = 10; // 채팅창에서 다음 메시지가 표시될 위치
     /*
@@ -115,6 +119,12 @@ public class ChatUI extends JFrame {
             textInput.setBounds(0, 0, 290, 50);
             textInput.requestFocus();
             textInput.addKeyListener(new PressEnter()); // 텍스트창에서 shift 또는 enter 키를 누를 시 작동함
+
+            StyledDocument doc = textInput.getStyledDocument();
+            SimpleAttributeSet left = new SimpleAttributeSet();
+
+            StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+            doc.setParagraphAttributes(0, doc.getLength(), left, false);
         });
 
         setVisible(true);
@@ -174,10 +184,14 @@ public class ChatUI extends JFrame {
                 shiftPressed = true;
             }
 
+            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                copied = true;
+            }
+
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
-                    currentTxt.append("\n");
+                    currentTxt.insert(currentTxt.indexOf("</p>") - 5, "<br>");
 
                     SwingUtilities.invokeLater(() -> {
                         textInput.setText(currentTxt.toString());
@@ -187,16 +201,34 @@ public class ChatUI extends JFrame {
                     sync.start("send");
                 }
             }
+
+            if (e.getKeyCode() == KeyEvent.VK_V) {
+                if (copied) {
+                    SwingUtilities.invokeLater(() -> {
+
+                        StyledDocument doc = textInput.getStyledDocument();
+                        SimpleAttributeSet left = new SimpleAttributeSet();
+
+                        StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+                        doc.setParagraphAttributes(0, doc.getLength(), left, false);
+                    });
+                }
+            }
         }
 
         @Override
         public void keyTyped(KeyEvent e) {
+
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) { // 쉬프트키를 떼었을 때
                 shiftPressed = false;
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                copied = false;
             }
         }
     }
@@ -266,7 +298,7 @@ public class ChatUI extends JFrame {
         String msg = textInput.getText().strip();
 
         // test
-        // System.out.println(msg);
+        System.out.println(msg);
 
         SwingUtilities.invokeLater(() -> { // 텍스트 입력창 비우기
             textInput.setText("");
@@ -321,12 +353,12 @@ public class ChatUI extends JFrame {
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 11px; text-align: right;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: right;'>" + sendMsg +
                             "</body></html>");
         } else { // 본인 외 다른 상대방의 메시지: 왼쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.LEFT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 11px; text-align: left;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: left;'>" + sendMsg +
                             "</body></html>");
         }
 
