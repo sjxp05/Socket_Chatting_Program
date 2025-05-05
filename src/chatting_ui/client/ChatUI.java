@@ -191,7 +191,7 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
-                    currentTxt.insert(currentTxt.indexOf("</p>") - 5, "<br>");
+                    currentTxt.insert(currentTxt.lastIndexOf("</p>") - 5, "<br>");
 
                     SwingUtilities.invokeLater(() -> {
                         textInput.setText(currentTxt.toString());
@@ -211,6 +211,10 @@ public class ChatUI extends JFrame {
 
                         StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
                         doc.setParagraphAttributes(0, doc.getLength(), left, false);
+
+                        SwingUtilities.invokeLater(() -> {
+                            textInput.repaint();
+                        });
                     });
                 }
             }

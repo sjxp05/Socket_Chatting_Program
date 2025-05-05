@@ -217,17 +217,6 @@ public class Main {
         System.out.println(msg.length());
 
         for (int i = 0; i < msg.length(); i++) {
-            if (msg.charAt(i) == '\n') { // 수정필요
-                while (true) {
-                    i++;
-                    if (msg.charAt(i) != ' ' && msg.charAt(i) != '\t') {
-                        i--;
-                        break;
-                    }
-                }
-                continue;
-            }
-
             if (msg.charAt(i) == '&') {
                 isSpecialLetter = true;
             }
@@ -242,9 +231,7 @@ public class Main {
             }
 
             if (i == msg.indexOf("<br>", i)) {
-                if (i < msg.length() - 4) {
-                    htmlText.append("<br>");
-                }
+                htmlText.append("<br>");
                 wordCount = 0;
                 i += 3;
                 continue;
