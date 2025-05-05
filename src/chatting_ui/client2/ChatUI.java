@@ -285,20 +285,9 @@ public class ChatUI extends JFrame {
         refresh();
     }
 
-    void showMessage(String sendName, String sendMsg, int sendID) {
+    void showMessage(String sendName, String sendMsg, int sendID, int height) {
         if (viewMode) {
             viewMembers();
-        }
-
-        int height = 20;
-        int lines = 1;
-
-        for (int i = 12; i < sendMsg.length(); i++) {
-            if (sendMsg.indexOf("<br>", i) >= 0) {
-                height += (21 + lines / 4);
-                lines++;
-                i = sendMsg.indexOf("<br>", i) + 4;
-            }
         }
 
         JLabel nameLb = new JLabel(sendName);
