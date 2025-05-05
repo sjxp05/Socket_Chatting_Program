@@ -94,7 +94,7 @@ public class ChatUI extends JFrame {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         pane.add(scroll);
 
-        textInput.setFont(new Font("Sans Serif", Font.PLAIN, 15));
+        textInput.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 15));
         textInput.setBounds(0, 0, 290, 50);
         textInput.setLineWrap(true);
         textInput.requestFocus();
@@ -309,16 +309,17 @@ public class ChatUI extends JFrame {
         JLabel nameLb = new JLabel(sendName); // 메시지 보낸 사용자 이름 라벨
         JTextPane msgLb = new JTextPane(); // 전송된 메시지 표시 라벨
         msgLb.setContentType("text/html");
+        msgLb.setOpaque(false);
 
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 15px; text-align: right;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: right;'>" + sendMsg +
                             "</body></html>");
         } else { // 본인 외 다른 상대방의 메시지: 왼쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.LEFT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 15px; text-align: left;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: left;'>" + sendMsg +
                             "</body></html>");
         }
 

@@ -320,7 +320,7 @@ public class Main {
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
             // 메시지의 줄 개수를 세서 라벨의 세로 길이 설정
-            int height = 20;
+            int height = 22;
             int lines = 1;
 
             for (int i = 0; i < sendMsg.length(); i++) {
