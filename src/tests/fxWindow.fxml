@@ -3,8 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" prefHeight="200.0" prefWidth="300.0">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="tests.FxPractice" prefHeight="200.0" prefWidth="300.0">
     <children>
-        <Label layoutX="40.0" layoutY="48.0" text="라벨" />
+        <Label fx:id="myLabel" layoutX="40.0" layoutY="48.0" text="라벨" 
+        style="-fx-font-family: 'Sans Serif'; -fx-font-size: 20px;" />
+        <Button fx:id="myButton" layoutX="110.0" layoutY="120.0" text="클릭하세요" onAction="#buttonClick" />
     </children>
 </AnchorPane>
