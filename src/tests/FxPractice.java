@@ -7,8 +7,12 @@ import javafx.stage.*;
 
 public class FxPractice extends Application {
     @Override
-    public void start(Stage arg0) throws Exception {
-
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(this.getClass().getResource("fxWindow.fxml"));
+        stage.setTitle("Test Program");
+        stage.setScene(new Scene(root));
+        // or stage.setScene(new Scene(root, 300, 200));
+        stage.show();
     }
 
     public static void main(String[] args) {

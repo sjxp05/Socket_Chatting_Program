@@ -327,9 +327,21 @@ public class Main {
             int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
 
             // test
-            System.out.println(sendMsg);
+            // System.out.println(sendMsg);
 
-            ui.showMessage(sendName, sendMsg, sendID); // 채팅창에 사용자이름+메시지 띄우기
+            int height = 20;
+            int lines = 1;
+
+            // 메시지의 줄 개수를 세서 라벨의 세로 길이 설정
+            for (int i = 12; i < sendMsg.length(); i++) {
+                if (sendMsg.indexOf("<br>", i) >= 0) {
+                    height += (21 + lines / 4);
+                    lines++;
+                    i = sendMsg.indexOf("<br>", i) + 4;
+                }
+            }
+
+            ui.showMessage(sendName, sendMsg, sendID, height); // 채팅창에 사용자이름+메시지 띄우기
         }
     }
 
@@ -347,6 +359,7 @@ public class Main {
             }
         } catch (Exception e) { // 서버 연결이 끊어졌을 경우
             JOptionPane.showMessageDialog(null, "서버 연결에 실패했습니다 ㅠㅠ\n황지인에게 서버를 열어달라고 요청해보세요!");
+            System.exit(0);
         }
     }
 }
