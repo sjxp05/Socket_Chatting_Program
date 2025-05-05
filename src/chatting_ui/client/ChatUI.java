@@ -321,12 +321,12 @@ public class ChatUI extends JFrame {
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: right;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 11px; text-align: right;'>" + sendMsg +
                             "</body></html>");
         } else { // 본인 외 다른 상대방의 메시지: 왼쪽에 표시
             nameLb.setHorizontalAlignment(JLabel.LEFT);
             msgLb.setText(
-                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: left;'>" + sendMsg +
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 11px; text-align: left;'>" + sendMsg +
                             "</body></html>");
         }
 

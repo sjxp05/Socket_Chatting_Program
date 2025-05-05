@@ -205,16 +205,24 @@ public class Main {
         // html로 바꿀 때 문자를 빠르게 추가하는 용도의 스트링버퍼
         StringBuffer htmlText = new StringBuffer("");
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
+        boolean isSpecialLetter = false; // 한 글자로 취급하는지
 
         for (int i = 0; i < msg.length(); i++) {
-            if (msg.charAt(i) >= 'A' && msg.charAt(i) <= 'Z') { // 영어 대문자일 경우
-                wordCount++;
-            } else if (msg.charAt(i) >= 'a' && msg.charAt(i) <= 'z') {// 영어 소문자
-                wordCount++;
-            } else if (msg.charAt(i) == '&') {
-                wordCount += 2;
-            } else if ((int) msg.charAt(i) < 128) { // 숫자/기본기호/한글 나타내는 태그일 경우
-                wordCount++;
+            if (msg.charAt(i) == '&') {
+                isSpecialLetter = true;
+            }
+
+            if (!isSpecialLetter) {
+                if ((int) msg.charAt(i) < 128) {
+                    wordCount += 2;
+                } else {
+                    wordCount += 3;
+                }
+            }
+
+            if (isSpecialLetter && msg.charAt(i) == ';') {
+                isSpecialLetter = false;
+                wordCount += 3;
             }
 
             if (i == msg.indexOf("<br>", i)) {
@@ -226,13 +234,12 @@ public class Main {
 
             htmlText.append(msg.charAt(i));
 
-            // if (wordCount >= 40) {
-            // if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만
-            // 줄바꿈
-            // htmlText.append("<br>");
-            // }
-            // wordCount = 0;
-            // }
+            if (wordCount >= 60) {
+                if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
+                    htmlText.append("<br>");
+                }
+                wordCount = 0;
+            }
         }
 
         System.out.println(htmlText);
