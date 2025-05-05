@@ -191,7 +191,10 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) { // 쉬프트와 엔터키(and/or) 눌린 상태일때
                 if (shiftPressed) { // 쉬프트키와 동시에 눌렸을 때: 줄바꾸기
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
-                    currentTxt.insert(currentTxt.lastIndexOf("</p>") - 5, "<br>");
+                    // currentTxt.insert(currentTxt.lastIndexOf("</p>") - 4, "<br>");
+                    // currentTxt.replace(currentTxt.lastIndexOf("\">") + 1,
+                    // currentTxt.lastIndexOf("</p>"), "<br>");
+                    // 줄바꿈 ㄹㅇ어케함?
 
                     SwingUtilities.invokeLater(() -> {
                         textInput.setText(currentTxt.toString());
