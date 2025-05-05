@@ -309,6 +309,7 @@ public class ChatUI extends JFrame {
         JLabel nameLb = new JLabel(sendName); // 메시지 보낸 사용자 이름 라벨
         JTextPane msgLb = new JTextPane(); // 전송된 메시지 표시 라벨
         msgLb.setContentType("text/html");
+        msgLb.setEditable(false);
         msgLb.setOpaque(false);
 
         if (sendID == Main.userID) { // 사용자 본인의 메시지: 오른쪽에 표시
