@@ -22,8 +22,10 @@ public class Handler extends Thread {
             socket = clientSocket;
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             writerList.add(out);
             userID = newUserID;
+
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());
         }
