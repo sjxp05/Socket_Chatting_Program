@@ -62,7 +62,7 @@ public class Server {
             System.exit(1);
         }
 
-        try (ServerSocket serverSocket = new ServerSocket(80)) {
+        try (ServerSocket serverSocket = new ServerSocket(12345)) {
             System.out.println("서버 가동 중...");
 
             // 서버가 가동되는 동안 클라이언트 계속해서 받기

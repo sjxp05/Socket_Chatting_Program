@@ -363,7 +363,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 소켓 연결
-            socket = new Socket("cow-funky-man.ngrok-free.app", 80);
+            socket = new Socket("localhost", 12345);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
