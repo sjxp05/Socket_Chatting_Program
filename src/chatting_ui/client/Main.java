@@ -46,6 +46,13 @@ public class Main {
      * - 실시간으로 상태를 확인해야 할 때 유용함
      */
 
+    static final int[] capitalWidth = new int[] { // 알파벳 대문자별 가로 길이
+            5, 4, 5, 5, 4, 4, 5, 5, 2, 3, 4, 3, 6, 5, 5, 4, 5, 4, 4, 3, 5, 4, 7, 4, 4, 4
+    };
+    static final int[] smallWidth = new int[] { // 알파벳 소문자별 가로 길이
+            4, 5, 4, 5, 4, 2, 4, 4, 2, 2, 4, 2, 6, 4, 4, 4, 4, 3, 3, 3, 4, 4, 5, 4, 4, 4
+    };
+
     private Main() {
         setNickname();
     }
@@ -204,11 +211,26 @@ public class Main {
         StringBuffer htmlText = new StringBuffer("<html><body>");
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
 
-        for (int i = 0; i < msg.length(); i++) {
-            if ((int) msg.charAt(i) < 128) { // 영어 알파벳 또는 기본 기호일 경우
+        PutInHTML: for (int i = 0; i < msg.length(); i++) {
+            // 영어 알파벳/숫자 등 가로길이별로 다르게 넣기
+            if (msg.charAt(i) >= 'A' && msg.charAt(i) <= 'Z') {
+                wordCount += capitalWidth[msg.charAt(i) - 'A'];
+            } else if (msg.charAt(i) >= 'a' && msg.charAt(i) <= 'z') {
+                wordCount += smallWidth[msg.charAt(i) - 'a'];
+            } else if (msg.charAt(i) >= '0' && msg.charAt(i) <= '9') {
+                wordCount += 4;
+            } else if (msg.charAt(i) == '.' || msg.charAt(i) == ',') {
                 wordCount++;
-            } else { // 한글 등 가로 길이가 긴 경우
+            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!') {
                 wordCount += 2;
+            } else if (msg.charAt(i) == '?' || msg.charAt(i) == '/') {
+                wordCount += 3;
+            } else {
+                if ((int) msg.charAt(i) < 128) { // 기본 기호일 경우
+                    wordCount += 4;
+                } else { // 한글 등 가로 길이가 긴 경우
+                    wordCount += 7;
+                }
             }
 
             // html에 들어갈 수 있는 문자로 변환
@@ -219,11 +241,12 @@ public class Main {
 
                 case '\n':
                     // 메시지 마지막에 개행 문자가 있을 경우 무시
-                    if (i < msg.length() - 1) { // 마지막이 아닐 경우에는 넣기
-                        htmlText.append("<br>");
-                    }
+                    // if (i < msg.length() - 1) { // 마지막이 아닐 경우에는 넣기
+                    // htmlText.append("<br>");
+                    // }
+                    htmlText.append("<br>");
                     wordCount = 0;
-                    break;
+                    continue PutInHTML;
 
                 case '\"':
                     htmlText.append("&quot;");
@@ -274,13 +297,14 @@ public class Main {
                     break;
             }
 
-            if (wordCount >= 40) {
+            if (wordCount >= 120) {
                 if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
                     htmlText.append("<br>");
                 }
                 wordCount = 0;
             }
         }
+
         htmlText.append("</body></html>");
 
         out.println(userName + ";" + htmlText + ';' + userID); // 서버로 전송
@@ -324,11 +348,11 @@ public class Main {
             int height = 21;
             // int lines = 1;
 
-            for (int i = 12; i < sendMsg.length(); i++) {
-                if (sendMsg.indexOf("<br>", i) >= 0) {
-                    height += 21;
+            for (int i = 12; i < sendMsg.length() - 14; i++) {
+                if (i == sendMsg.indexOf("<br>", i)) {
+                    height += 19;
                     // lines++;
-                    i = sendMsg.indexOf("<br>", i) + 4;
+                    i += 3;
                 }
             }
 
