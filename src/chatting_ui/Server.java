@@ -52,6 +52,7 @@ public class Server {
                 BufferedReader reader = new BufferedReader(new FileReader(serverSaveFile));
                 newUserID = Integer.parseInt(reader.readLine()); // 파일에 적혀 있는 번호가 다음 사용자 ID임
                 reader.close();
+
             } else { // 파일이 존재하지 않을 경우(아이디를 0으로 초기화)
                 PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(serverSaveFile)));
                 writer.println("0");
@@ -63,6 +64,7 @@ public class Server {
         }
 
         try (ServerSocket serverSocket = new ServerSocket(12345, 0, InetAddress.getByName("192.168.195.136"))) {
+
             System.out.println("서버 가동 중...");
 
             // 서버가 가동되는 동안 클라이언트 계속해서 받기
