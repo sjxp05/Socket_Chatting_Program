@@ -14,7 +14,7 @@ public class Main {
     private static PrintWriter out;
 
     private static final File saveFolder = new File(System.getProperty("user.home") + "/chatclient2/");
-    private static final File saveFile = new File(saveFolder, "chat-client2-info.txt");
+    private static final File saveFile = new File(saveFolder, "chat-client-info.txt");
 
     static ArrayList<String> nameList = new ArrayList<>();
 
@@ -22,6 +22,13 @@ public class Main {
     static volatile String userName = "";
     static volatile int lastSpeakerID = -1;
     static volatile boolean added = false;
+
+    static final int[] capitalWidth = new int[] {
+            5, 4, 5, 5, 4, 4, 5, 5, 2, 3, 4, 3, 6, 5, 5, 4, 5, 4, 4, 3, 5, 4, 7, 4, 4, 4
+    };
+    static final int[] smallWidth = new int[] {
+            4, 5, 4, 5, 4, 2, 4, 4, 2, 2, 4, 2, 6, 4, 4, 4, 4, 3, 3, 3, 4, 4, 5, 4, 4, 4
+    };
 
     private Main() {
         setNickname();
@@ -49,9 +56,9 @@ public class Main {
 
         if (userName.strip().length() > 0) {
             try {
-                out.println("" + userID + "@" + userName);
+                out.println("REJOIN@" + userID + "@" + userName);
                 String confirmMsg = in.readLine();
-                if (confirmMsg.indexOf("OK@") == 0) {
+                if (confirmMsg.indexOf("CONFIRM@") == 0) {
                     return;
                 }
             } catch (Exception e) {
@@ -75,17 +82,17 @@ public class Main {
                 continue SetNickname;
             }
 
-            if (userName.indexOf(';') >= 0 || userName.indexOf('@') >= 0) {
-                nickNameMsg = "닉네임에는 ';'나 '@' 기호를\n사용할 수 없습니다.";
+            if (userName.indexOf('@') >= 0) {
+                nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
                 continue SetNickname;
             }
 
             try {
-                out.println(userName);
+                out.println("NEW@" + userName);
                 String confirmMsg = in.readLine();
 
-                if (confirmMsg.indexOf("OK@") == 0) {
+                if (confirmMsg.indexOf("CONFIRM@") == 0) {
                     userID = Integer.parseInt(confirmMsg.substring(confirmMsg.indexOf("@") + 1));
 
                     PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
@@ -127,14 +134,14 @@ public class Main {
                 continue ChangeNickname;
             }
 
-            if (newName.indexOf(';') >= 0 || newName.indexOf('@') >= 0) {
-                nickNameMsg = "닉네임에는 ';'나 '@' 기호를\n사용할 수 없습니다.";
+            if (newName.indexOf('@') >= 0) {
+                nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
                 continue ChangeNickname;
             }
 
             try {
-                out.println(newName + "@change");
+                out.println("CHANGE@" + userID + "@" + newName);
                 userName = newName;
 
                 PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
@@ -151,9 +158,10 @@ public class Main {
     }
 
     static void viewRequest() {
+
         nameList.clear();
 
-        out.println("@viewNickname@");
+        out.println("VIEWNICKNAME@" + userID);
         while (true) {
             if (added == true) {
                 nameList.sort(null);
@@ -171,11 +179,25 @@ public class Main {
         StringBuffer htmlText = new StringBuffer("<html><body>");
         int wordCount = 0;
 
-        for (int i = 0; i < msg.length(); i++) {
-            if ((int) msg.charAt(i) < 128) {
+        PutInHTML: for (int i = 0; i < msg.length(); i++) {
+            if (msg.charAt(i) >= 'A' && msg.charAt(i) <= 'Z') {
+                wordCount += capitalWidth[msg.charAt(i) - 'A'];
+            } else if (msg.charAt(i) >= 'a' && msg.charAt(i) <= 'z') {
+                wordCount += smallWidth[msg.charAt(i) - 'a'];
+            } else if (msg.charAt(i) >= '0' && msg.charAt(i) <= '9') {
+                wordCount += 4;
+            } else if (msg.charAt(i) == '.' || msg.charAt(i) == ',') {
                 wordCount++;
-            } else {
+            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!') {
                 wordCount += 2;
+            } else if (msg.charAt(i) == '?' || msg.charAt(i) == '/') {
+                wordCount += 3;
+            } else {
+                if ((int) msg.charAt(i) < 128) {
+                    wordCount += 4;
+                } else {
+                    wordCount += 7;
+                }
             }
 
             switch (msg.charAt(i)) {
@@ -184,10 +206,12 @@ public class Main {
                     break;
 
                 case '\n':
-                    if (i < msg.length() - 1) {
-                        htmlText.append("<br>");
-                    }
+                    htmlText.append("<br>");
                     wordCount = 0;
+                    continue PutInHTML;
+
+                case '@':
+                    htmlText.append("&#64;");
                     break;
 
                 case '\"':
@@ -239,68 +263,66 @@ public class Main {
                     break;
             }
 
-            if (wordCount >= 40) {
+            if (wordCount >= 120) {
                 if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') {
                     htmlText.append("<br>");
                 }
                 wordCount = 0;
             }
         }
+
         htmlText.append("</body></html>");
 
-        out.println(userName + ";" + htmlText + ';' + userID);
+        out.println("MSG@" + userID + "@" + userName + "@" + htmlText);
     }
 
     synchronized void readMessage(String input) {
-        if (input.indexOf(';') == -1) {
-            if (input.equals("@viewend")) {
+        String[] tokens = input.split("@");
+
+        switch (tokens[0]) {
+            case "VIEW":
+                nameList.add(tokens[2]);
+                break;
+
+            case "VIEWEND":
                 added = true;
-                return;
+                break;
 
-            } else if (input.indexOf("@view@") >= 0) {
-                String[] info = input.split("@");
-
-                if (Integer.parseInt(info[2]) != userID) {
-                    nameList.add(info[0]);
-                }
-                return;
-
-            } else if (input.indexOf("@changed@") >= 0) {
-                int changedID = Integer.parseInt(input.substring(0, input.indexOf("@")));
-
-                if (changedID == lastSpeakerID) {
+            case "HASCHANGED":
+                if (Integer.parseInt(tokens[1]) == lastSpeakerID) {
                     lastSpeakerID = -1;
                 }
 
                 ui.refresh();
-                return;
+                break;
 
-            } else if (input.indexOf('@') == 0) {
-                ui.showNotices(input.substring(1));
-            }
-        } else {
-            String sendName = input.substring(0, input.indexOf(';'));
-            String sendMsg = input.substring(input.indexOf(';') + 1, input.lastIndexOf(';'));
-            int sendID = Integer.parseInt(input.substring(input.lastIndexOf(';') + 1));
+            case "NOTICE":
+                ui.showNotices(tokens[1]);
+                break;
 
-            int height = 20;
-            int lines = 1;
+            case "MSG": {
 
-            for (int i = 12; i < sendMsg.length(); i++) {
-                if (sendMsg.indexOf("<br>", i) >= 0) {
-                    height += (21 + lines / 4);
-                    lines++;
-                    i = sendMsg.indexOf("<br>", i) + 4;
+                int height = 21;
+
+                for (int i = 12; i < tokens[3].length() - 14; i++) {
+                    if (i == tokens[3].indexOf("<br>", i)) {
+                        height += 19;
+                        i += 3;
+                    }
                 }
+
+                ui.showMessage(Integer.parseInt(tokens[1]), tokens[2], tokens[3], height);
+                break;
             }
 
-            ui.showMessage(sendName, sendMsg, sendID, height);
+            default:
+                break;
         }
     }
 
     public static void main(String[] args) {
         try {
-            socket = new Socket("localhost", 12345);
+            socket = new Socket("192.168.195.136", 12345);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 

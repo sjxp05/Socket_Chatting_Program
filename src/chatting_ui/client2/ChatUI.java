@@ -169,9 +169,10 @@ public class ChatUI extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 if (shiftPressed) {
                     StringBuffer currentTxt = new StringBuffer(textInput.getText());
+                    currentTxt.append("\n");
 
                     SwingUtilities.invokeLater(() -> {
-                        textInput.setText(currentTxt + "\n");
+                        textInput.setText(currentTxt.toString());
                         textInput.requestFocus();
                     });
                 } else {
@@ -285,26 +286,33 @@ public class ChatUI extends JFrame {
         refresh();
     }
 
-    void showMessage(String sendName, String sendMsg, int sendID, int height) {
+    void showMessage(int sendID, String sendName, String sendMsg, int height) {
         if (viewMode) {
             viewMembers();
         }
 
         JLabel nameLb = new JLabel(sendName);
-        JLabel msgLb = new JLabel(sendMsg);
+        JTextPane msgLb = new JTextPane();
+        msgLb.setContentType("text/html");
+        msgLb.setEditable(false);
+        msgLb.setOpaque(false);
 
         if (sendID == Main.userID) {
             nameLb.setHorizontalAlignment(JLabel.RIGHT);
-            msgLb.setHorizontalAlignment(JLabel.RIGHT);
+            msgLb.setText(
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: right;'>" + sendMsg +
+                            "</body></html>");
         } else {
             nameLb.setHorizontalAlignment(JLabel.LEFT);
-            msgLb.setHorizontalAlignment(JLabel.LEFT);
+            msgLb.setText(
+                    "<html><body style='font-family: Segoe UI Emoji; font-size: 12px; text-align: left;'>" + sendMsg +
+                            "</body></html>");
         }
 
         if (sendID == Main.lastSpeakerID) {
             nextMsgLocation -= 10;
         } else {
-            nameLb.setBounds(10, nextMsgLocation, 330, 20);
+            nameLb.setBounds(13, nextMsgLocation, 324, 20);
             nameLb.setFont(new Font("Sans Serif", Font.PLAIN, 14));
             nameLb.setForeground(Color.GRAY);
             msgPanel.add(nameLb);
@@ -314,7 +322,6 @@ public class ChatUI extends JFrame {
         }
 
         msgLb.setBounds(10, nextMsgLocation, 330, height);
-        msgLb.setFont(new Font("Sans Serif", Font.PLAIN, 15));
         msgPanel.add(msgLb);
         nextMsgLocation += (15 + height);
 
