@@ -201,27 +201,6 @@ public class Main {
             }
 
             switch (msg.charAt(i)) {
-                case ' ':
-                    htmlText.append("&nbsp;");
-                    break;
-
-                case '\n':
-                    htmlText.append("<br>");
-                    wordCount = 0;
-                    continue PutInHTML;
-
-                case '@':
-                    htmlText.append("&#64;");
-                    break;
-
-                case '\"':
-                    htmlText.append("&quot;");
-                    break;
-
-                case '&':
-                    htmlText.append("&amp;");
-                    break;
-
                 case '<':
                     htmlText.append("&lt;");
                     break;
@@ -230,32 +209,29 @@ public class Main {
                     htmlText.append("&gt;");
                     break;
 
-                case '÷':
-                    htmlText.append("&divide;");
+                case '\"':
+                    htmlText.append("&quot;");
                     break;
 
-                case '®':
-                    htmlText.append("&reg;");
+                case '\'':
+                    htmlText.append("&#39;");
                     break;
 
-                case '·':
-                    htmlText.append("&middot;");
+                case '&':
+                    htmlText.append("&amp;");
                     break;
 
-                case '±':
-                    htmlText.append("&plusmn;");
+                case '@':
+                    htmlText.append("&#64;");
                     break;
 
-                case 'ⓒ':
-                    htmlText.append("&copy;");
-                    break;
+                case '\n':
+                    htmlText.append("<br>");
+                    wordCount = 0;
+                    continue PutInHTML;
 
-                case '°':
-                    htmlText.append("&deg;");
-                    break;
-
-                case '×':
-                    htmlText.append("&times;");
+                case ' ':
+                    htmlText.append("&nbsp;");
                     break;
 
                 default:

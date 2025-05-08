@@ -92,7 +92,7 @@ public class Main {
 
         // 새로운 닉네임이 필요할 경우
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.\n ";
-        int messageType = 3; // 안내 메시지의 아이콘 종류 결정
+        int messageType = 3; // 안내 메시지의 아이콘 종류 결정 (3: 입력, 2: 경고)
 
         SetNickname: while (true) {
             try {
@@ -148,6 +148,7 @@ public class Main {
                         .showInputDialog(ui, nickNameMsg, "닉네임 변경", messageType,
                                 null, null, userName)
                         .toString().strip();
+
             } catch (Exception e) {
                 return;
             }
@@ -236,31 +237,6 @@ public class Main {
 
             // html에 들어갈 수 있는 문자로 변환
             switch (msg.charAt(i)) {
-                case ' ':
-                    htmlText.append("&nbsp;");
-                    break;
-
-                case '\n':
-                    // 메시지 마지막에 개행 문자가 있을 경우 무시
-                    // if (i < msg.length() - 1) { // 마지막이 아닐 경우에는 넣기
-                    // htmlText.append("<br>");
-                    // }
-                    htmlText.append("<br>");
-                    wordCount = 0;
-                    continue PutInHTML;
-
-                case '@': // 프로토콜 구분기호로 사용되므로 꼭 처리해줘야됨!
-                    htmlText.append("&#64;");
-                    break;
-
-                case '\"':
-                    htmlText.append("&quot;");
-                    break;
-
-                case '&':
-                    htmlText.append("&amp;");
-                    break;
-
                 case '<':
                     htmlText.append("&lt;");
                     break;
@@ -269,35 +245,32 @@ public class Main {
                     htmlText.append("&gt;");
                     break;
 
-                case '÷':
-                    htmlText.append("&divide;");
+                case '\"':
+                    htmlText.append("&quot;");
                     break;
 
-                case '®':
-                    htmlText.append("&reg;");
+                case '\'':
+                    htmlText.append("&#39;");
                     break;
 
-                case '·':
-                    htmlText.append("&middot;");
+                case '&': // 여기까지는 이스케이프 필수로 처리해줘야 함
+                    htmlText.append("&amp;");
                     break;
 
-                case '±':
-                    htmlText.append("&plusmn;");
+                case '@': // 프로토콜 구분기호로 사용되므로 얘도 꼭 처리해줘야됨!
+                    htmlText.append("&#64;");
                     break;
 
-                case 'ⓒ':
-                    htmlText.append("&copy;");
+                case '\n': // 줄바꿈
+                    htmlText.append("<br>");
+                    wordCount = 0;
+                    continue PutInHTML;
+
+                case ' ': // 연속 띄어쓰기 대비
+                    htmlText.append("&nbsp;");
                     break;
 
-                case '°':
-                    htmlText.append("&deg;");
-                    break;
-
-                case '×':
-                    htmlText.append("&times;");
-                    break;
-
-                default:
+                default: // 나머지 문자는 그냥 넣어도 무방
                     htmlText.append(msg.charAt(i));
                     break;
             }

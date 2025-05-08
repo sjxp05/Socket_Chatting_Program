@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Handler extends Thread {
     // 서버에 연결된 모든 소켓의 outputStream 모아놓은 리스트
-    static ArrayList<PrintWriter> writerList = new ArrayList<>();
+    private static final ArrayList<PrintWriter> writerList = new ArrayList<>();
 
     private Socket socket;
     private BufferedReader in;

@@ -9,9 +9,9 @@ public class Server {
     private static final ConcurrentHashMap<Integer, String> userInfo = new ConcurrentHashMap<>();
     private static int newUserID = 0; // 다음에 들어오는 사용자에게 부여할 고유 ID
 
-    private static String serverHome = System.getProperty("user.home"); // 사용자 폴더 위치 읽어오기
-    private static File serverFolder = new File(serverHome, "chatserver/"); // 폴더 위치 지정
-    private static File serverSaveFile = new File(serverFolder, "last_id.txt"); // 텍스트 파일 위치 지정
+    private static final String serverHome = System.getProperty("user.home"); // 사용자 폴더 위치 읽어오기
+    private static final File serverFolder = new File(serverHome, "chatserver/"); // 폴더 위치 지정
+    private static final File serverSaveFile = new File(serverFolder, "last_id.txt"); // 텍스트 파일 위치 지정
 
     // 닉네임 추가하기
     public static synchronized void addNickname(String userName) {
