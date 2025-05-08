@@ -176,7 +176,7 @@ public class Main {
             return;
         }
 
-        StringBuffer htmlText = new StringBuffer("<html><body>");
+        StringBuffer htmlText = new StringBuffer("");
         int wordCount = 0;
 
         PutInHTML: for (int i = 0; i < msg.length(); i++) {
@@ -247,8 +247,6 @@ public class Main {
             }
         }
 
-        htmlText.append("</body></html>");
-
         out.println("MSG@" + userID + "@" + userName + "@" + htmlText);
     }
 
@@ -280,7 +278,7 @@ public class Main {
 
                 int height = 21;
 
-                for (int i = 12; i < tokens[3].length() - 14; i++) {
+                for (int i = 0; i < tokens[3].length(); i++) {
                     if (i == tokens[3].indexOf("<br>", i)) {
                         height += 19;
                         i += 3;

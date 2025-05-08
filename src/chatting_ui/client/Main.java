@@ -78,7 +78,7 @@ public class Main {
             }
         }
 
-        if (userName.strip().length() > 0) { // 서버에 사용자 입장 메시지 보내기
+        if (userName.strip().length() > 0) { // 서버에 사용자 입장 요청 보내기
             try {
                 out.println("REJOIN@" + userID + "@" + userName);
                 String confirmMsg = in.readLine();
@@ -210,7 +210,7 @@ public class Main {
         }
 
         // html로 바꿀 때 문자를 빠르게 추가하는 용도의 스트링버퍼
-        StringBuffer htmlText = new StringBuffer("<html><body>");
+        StringBuffer htmlText = new StringBuffer("");
         int wordCount = 0; // 한 줄에 추가된 글자 수 (개행문자 삽입 기준이 됨)
 
         PutInHTML: for (int i = 0; i < msg.length(); i++) {
@@ -283,8 +283,6 @@ public class Main {
             }
         }
 
-        htmlText.append("</body></html>");
-
         out.println("MSG@" + userID + "@" + userName + "@" + htmlText); // 서버로 전송
     }
 
@@ -318,7 +316,7 @@ public class Main {
 
                 int height = 21; // 메시지의 줄 개수를 세서 라벨의 세로 길이 설정
 
-                for (int i = 12; i < tokens[3].length() - 14; i++) {
+                for (int i = 0; i < tokens[3].length(); i++) {
                     if (i == tokens[3].indexOf("<br>", i)) {
                         height += 19;
                         i += 3;
