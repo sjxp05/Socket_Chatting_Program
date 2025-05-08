@@ -1,8 +1,8 @@
 package chatting_ui;
 
 import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Handler extends Thread {
@@ -13,7 +13,7 @@ public class Handler extends Thread {
     private BufferedReader in;
     private PrintWriter out;
 
-    private int userID = 0; // 서버에서 준 기본 아이디
+    private int userID = 0; // 서버에서 준 고유 아이디
     private String userName; // 현재 클라이언트의 닉네임과 같음
 
     public Handler(Socket clientSocket, int newUserID) {
@@ -24,14 +24,14 @@ public class Handler extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             writerList.add(out);
-            userID = newUserID;
+            userID = newUserID; // 일단 다음 신규유저에게 쓸 아이디로 할당해주기
 
         } catch (Exception e) {
             System.out.println("오류 발생: " + e.getMessage());
         }
     }
 
-    // 모든 사용자의 닉네임 목록을 해당 클라이언트의 스트림으로만 보냄 (모든 사용자 x)
+    // 모든 사용자의 닉네임 목록을 해당 클라이언트의 스트림으로만 보냄 (모든 클라이언트에게 보내는거 x)
     void nicknameInfo() {
 
         ConcurrentHashMap<Integer, String> list = Server.viewNickname();
@@ -39,10 +39,10 @@ public class Handler extends Thread {
         for (int id : list.keySet()) {
             // '목록 전송 전용'이라는 뜻의 메시지 + 사용자의 고유id + 각 사용자 닉네임
             if (id != userID) {
-                out.println("VIEW@" + id + "@" + list.get(id));
+                out.println("VIEW@" + list.get(id));
             }
         }
-        out.println("VIEWEND@" + userID);
+        out.println("VIEWEND@");
     }
 
     // 모든 사용자의 스트림으로 메시지나 안내문을 전송
@@ -79,13 +79,13 @@ public class Handler extends Thread {
                 String[] tokens = inputMsg.split("@");
 
                 switch (tokens[0]) {
-                    case "VIEWNICKNAME" -> {// 유저목록 보기 요청을 받았을 경우
+                    case "VIEWNICKNAME" -> { // 유저목록 보기 요청을 받았을 경우
                         nicknameInfo();
                         break;
                     }
 
-                    case "CHANGE" -> {// 닉네임 변경 요청 받았을 경우
-                        Server.existingNickname(userID, tokens[2]);
+                    case "CHANGE" -> { // 닉네임 변경 요청 받았을 경우
+                        Server.existingNickname(userID, tokens[1]);
                         sendAll("HASCHANGED@" + userID);
                         break;
                     }

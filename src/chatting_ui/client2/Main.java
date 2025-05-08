@@ -141,7 +141,7 @@ public class Main {
             }
 
             try {
-                out.println("CHANGE@" + userID + "@" + newName);
+                out.println("CHANGE@" + newName);
                 userName = newName;
 
                 PrintWriter nameWriter = new PrintWriter(new BufferedWriter(new FileWriter(saveFile)));
@@ -161,7 +161,7 @@ public class Main {
 
         nameList.clear();
 
-        out.println("VIEWNICKNAME@" + userID);
+        out.println("VIEWNICKNAME@");
         while (true) {
             if (added == true) {
                 nameList.sort(null);
@@ -281,7 +281,7 @@ public class Main {
 
         switch (tokens[0]) {
             case "VIEW":
-                nameList.add(tokens[2]);
+                nameList.add(tokens[1]);
                 break;
 
             case "VIEWEND":

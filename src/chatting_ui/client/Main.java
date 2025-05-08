@@ -170,7 +170,7 @@ public class Main {
 
             try {
                 // 서버 리스트에 존재하는 이름 변경 요청
-                out.println("CHANGE@" + userID + "@" + newName);
+                out.println("CHANGE@" + newName);
                 userName = newName;
 
                 // 파일에 새로운 이름 기록
@@ -192,7 +192,7 @@ public class Main {
 
         nameList.clear(); // 나가는 사용자를 대비해 기존 리스트 비우기
 
-        out.println("VIEWNICKNAME@" + userID);
+        out.println("VIEWNICKNAME@");
         while (true) {
             if (added == true) { // 모든 사용자 닉네임이 추가되면 while루프 탈출하기
                 nameList.sort(null);
@@ -321,7 +321,7 @@ public class Main {
 
         switch (tokens[0]) {
             case "VIEW": // 사용자 목록 받기
-                nameList.add(tokens[2]);
+                nameList.add(tokens[1]);
                 break;
 
             case "VIEWEND": // 사용자 목록을 다 확인했을 경우
