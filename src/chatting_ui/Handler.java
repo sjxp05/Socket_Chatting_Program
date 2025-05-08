@@ -33,13 +33,16 @@ public class Handler extends Thread {
 
     // 모든 사용자의 닉네임 목록을 해당 클라이언트의 스트림으로만 보냄 (모든 사용자 x)
     void nicknameInfo() {
+
         ConcurrentHashMap<Integer, String> list = Server.viewNickname();
 
         for (int id : list.keySet()) {
-            // 각 사용자 닉네임 + '목록 전송 전용'이라는 뜻의 메시지 + 사용자의 고유id
-            out.println(list.get(id) + "@view@" + id);
+            // '목록 전송 전용'이라는 뜻의 메시지 + 사용자의 고유id + 각 사용자 닉네임
+            if (id != userID) {
+                out.println("VIEW@" + id + "@" + list.get(id));
+            }
         }
-        out.println("@viewend");
+        out.println("VIEWEND@" + userID);
     }
 
     // 모든 사용자의 스트림으로 메시지나 안내문을 전송
@@ -52,44 +55,56 @@ public class Handler extends Thread {
     @Override
     public void run() {
         try {
-            // 첫 시작 시 닉네임 받기
+            // 첫 시작 시 닉네임 지정 요청받기
             userName = in.readLine();
+            String[] info = userName.split("@"); // 토큰 나누기
 
-            if (userName.indexOf('@') >= 0) {
-                String[] info = userName.split("@");
-                userID = Integer.parseInt(info[0]);
-                userName = info[1];
-
+            if (info[0].equals("REJOIN")) { // 기존 멤버의 참여 요청 시
+                userID = Integer.parseInt(info[1]);
+                userName = info[2];
                 Server.existingNickname(userID, userName);
-                out.println("OK@" + userID);
-            } else {
+
+            } else if (info[0].equals("NEW")) { // 새로운 멤버 요청 시 아이디 부여하기
+                userName = info[1];
                 Server.addNickname(userName);
-                out.println("OK@" + userID);
             }
 
+            out.println("CONFIRM@" + userID);
+
             System.out.println("[" + userName + " 연결됨]");
-            sendAll("@" + userName + " 님이 참여했습니다.");
+            sendAll("NOTICE@" + userName + " 님이 참여했습니다.");
 
             while (in != null) {
                 String inputMsg = in.readLine();
+                String[] tokens = inputMsg.split("@");
 
-                if (inputMsg.equals("@viewNickname@")) {
-                    // 닉네임 목록 보기 요청을 받았을 경우
-                    nicknameInfo();
-                } else if (inputMsg.indexOf(';') == -1 && inputMsg.indexOf("@change") >= 0) {
-                    // 닉네임 변경 요청 받았을 경우
-                    Server.existingNickname(userID, inputMsg.substring(0, inputMsg.indexOf('@')));
-                    sendAll(userID + "@changed@");
-                } else {
-                    // 사용자가 보낸 메시지나 입장/퇴장 안내는 모든 사용자에게 보냄
-                    sendAll(inputMsg);
+                switch (tokens[0]) {
+                    case "VIEWNICKNAME" -> {// 유저목록 보기 요청을 받았을 경우
+                        nicknameInfo();
+                        break;
+                    }
+
+                    case "CHANGE" -> {// 닉네임 변경 요청 받았을 경우
+                        Server.existingNickname(userID, tokens[2]);
+                        sendAll("HASCHANGED@" + userID);
+                        break;
+                    }
+
+                    case "NOTICE", "MSG" -> { // 기타 메시지(입/퇴장, 일반 사용자 메시지)는 모두에게 전송
+                        sendAll(inputMsg);
+                        break;
+                    }
+
+                    default -> {
+                        break;
+                    }
                 }
             }
         } catch (IOException e) { // 소켓의 i/o 스트림과 연결이 끊겼을 경우. 즉 해당 클라이언트가 방을 나갔을 때
             System.out.println("[" + userName + " 접속 끊김]");
 
         } finally { // 접속 끊긴 후 마무리 작업
-            sendAll("@" + userName + " 님이 나갔습니다.");
+            sendAll("NOTICE@" + userName + " 님이 나갔습니다.");
             writerList.remove(out); // 목록에서 해당 사용자의 아웃풋 스트림 없애기
             Server.removeNickname(userID); // 서버의 닉네임 리스트에서 사용자 닉네임 지우기
 

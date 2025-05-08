@@ -1,4 +1,4 @@
-package chatting_ui.client;
+package chatting_ui.client3;
 
 import java.io.*;
 import java.net.*;
@@ -30,7 +30,7 @@ public class Main {
 
     // 사용자 정보 저장할 파일 위치
     private static final File saveFolder = new File(System.getProperty("user.home") + "/chatclient/");
-    private static final File saveFile = new File(saveFolder, "chat-client-info.txt");
+    private static final File saveFile = new File(saveFolder, "chat-client3-info.txt");
 
     // 유저목록 보기 기능을 위한 사용자 닉네임 리스트
     static ArrayList<String> nameList = new ArrayList<>();
