@@ -31,10 +31,6 @@ public class Main {
     };
 
     private Main() {
-        setNickname();
-    }
-
-    void setNickname() {
         if (!saveFolder.exists()) {
             try {
                 saveFolder.mkdir();
@@ -54,6 +50,10 @@ public class Main {
             }
         }
 
+        setNickname();
+    }
+
+    void setNickname() {
         if (userName.strip().length() > 0) {
             try {
                 out.println("REJOIN@" + userID + "@" + userName);
@@ -69,7 +69,7 @@ public class Main {
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.\n ";
         int messageType = 3;
 
-        SetNickname: while (true) {
+        while (true) {
             try {
                 userName = JOptionPane.showInputDialog(ui, nickNameMsg, "닉네임 설정", messageType).strip();
             } catch (Exception e) {
@@ -79,13 +79,13 @@ public class Main {
             if (userName.length() == 0 || userName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2;
-                continue SetNickname;
+                continue;
             }
 
             if (userName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
-                continue SetNickname;
+                continue;
             }
 
             try {
@@ -113,7 +113,7 @@ public class Main {
         String nickNameMsg = "변경할 닉네임을 입력해 주세요.\n ";
         int messageType = 3;
 
-        ChangeNickname: while (true) {
+        while (true) {
             String newName;
             try {
                 newName = JOptionPane
@@ -131,13 +131,13 @@ public class Main {
             if (newName.length() == 0 || newName.length() > 15) {
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2;
-                continue ChangeNickname;
+                continue;
             }
 
             if (newName.indexOf('@') >= 0) {
                 nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
-                continue ChangeNickname;
+                continue;
             }
 
             try {
@@ -158,10 +158,9 @@ public class Main {
     }
 
     static void viewRequest() {
-
         nameList.clear();
-
         out.println("VIEWNICKNAME@");
+
         while (true) {
             if (added == true) {
                 nameList.sort(null);
@@ -180,6 +179,7 @@ public class Main {
         int wordCount = 0;
 
         PutInHTML: for (int i = 0; i < msg.length(); i++) {
+
             if (msg.charAt(i) >= 'A' && msg.charAt(i) <= 'Z') {
                 wordCount += capitalWidth[msg.charAt(i) - 'A'];
             } else if (msg.charAt(i) >= 'a' && msg.charAt(i) <= 'z') {

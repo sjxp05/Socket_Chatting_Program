@@ -54,11 +54,6 @@ public class Main {
     };
 
     private Main() {
-        setNickname();
-    }
-
-    // 처음 시작할 때 닉네임 설정하기
-    void setNickname() {
         if (!saveFolder.exists()) { // 폴더가 존재하지 않을 때
             try {
                 saveFolder.mkdir();
@@ -78,7 +73,13 @@ public class Main {
             }
         }
 
-        if (userName.strip().length() > 0) { // 서버에 사용자 입장 요청 보내기
+        setNickname();
+    }
+
+    // 처음 시작할 때 닉네임 설정하기
+    void setNickname() {
+        // 기존 정보가 있을 경우
+        if (userName.strip().length() > 0) {
             try {
                 out.println("REJOIN@" + userID + "@" + userName);
                 String confirmMsg = in.readLine();
@@ -94,7 +95,7 @@ public class Main {
         String nickNameMsg = "채팅방에서 사용할 닉네임을 입력해 주세요.\n ";
         int messageType = 3; // 안내 메시지의 아이콘 종류 결정 (3: 입력, 2: 경고)
 
-        SetNickname: while (true) {
+        while (true) {
             try {
                 userName = JOptionPane.showInputDialog(ui, nickNameMsg, "닉네임 설정", messageType).strip();
             } catch (Exception e) {
@@ -104,13 +105,13 @@ public class Main {
             if (userName.length() == 0 || userName.length() > 15) { // 길이제한
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2; // 메시지 아이콘을 '경고'로 바꾸기
-                continue SetNickname;
+                continue;
             }
 
             if (userName.indexOf('@') >= 0) { // 기호제한
                 nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
-                continue SetNickname;
+                continue;
             }
 
             try {
@@ -138,10 +139,11 @@ public class Main {
 
     // 닉네임 변경
     static void changeNickname() {
+
         String nickNameMsg = "변경할 닉네임을 입력해 주세요.\n ";
         int messageType = 3;
 
-        ChangeNickname: while (true) {
+        while (true) {
             String newName;
             try {
                 newName = JOptionPane
@@ -160,13 +162,13 @@ public class Main {
             if (newName.length() == 0 || newName.length() > 15) { // 길이제한
                 nickNameMsg = "닉네임은 1~15자이어야 합니다.\n ";
                 messageType = 2;
-                continue ChangeNickname;
+                continue;
             }
 
             if (newName.indexOf('@') >= 0) { // 기호제한
                 nickNameMsg = "닉네임에는 '@' 기호를 사용할 수 없습니다.";
                 messageType = 2;
-                continue ChangeNickname;
+                continue;
             }
 
             try {
@@ -190,10 +192,9 @@ public class Main {
 
     // 서버에 멤버 목록 전송 요청
     static void viewRequest() {
-
         nameList.clear(); // 나가는 사용자를 대비해 기존 리스트 비우기
-
         out.println("VIEWNICKNAME@");
+
         while (true) {
             if (added == true) { // 모든 사용자 닉네임이 추가되면 while루프 탈출하기
                 nameList.sort(null);
