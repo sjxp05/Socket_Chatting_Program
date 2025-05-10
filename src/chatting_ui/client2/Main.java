@@ -188,7 +188,7 @@ public class Main {
                 wordCount += 4;
             } else if (msg.charAt(i) == '.' || msg.charAt(i) == ',') {
                 wordCount++;
-            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!') {
+            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!' || msg.charAt(i) == '(' || msg.charAt(i) == ')') {
                 wordCount += 2;
             } else if (msg.charAt(i) == '?' || msg.charAt(i) == '/') {
                 wordCount += 3;
@@ -196,7 +196,7 @@ public class Main {
                 if ((int) msg.charAt(i) < 128) {
                     wordCount += 4;
                 } else {
-                    wordCount += 7;
+                    wordCount += 8;
                 }
             }
 
@@ -239,7 +239,7 @@ public class Main {
                     break;
             }
 
-            if (wordCount >= 120) {
+            if (wordCount >= 160) {
                 if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') {
                     htmlText.append("<br>");
                 }

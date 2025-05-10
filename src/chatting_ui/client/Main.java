@@ -224,7 +224,7 @@ public class Main {
                 wordCount += 4;
             } else if (msg.charAt(i) == '.' || msg.charAt(i) == ',') {
                 wordCount++;
-            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!') {
+            } else if (msg.charAt(i) == ' ' || msg.charAt(i) == '!' || msg.charAt(i) == '(' || msg.charAt(i) == ')') {
                 wordCount += 2;
             } else if (msg.charAt(i) == '?' || msg.charAt(i) == '/') {
                 wordCount += 3;
@@ -232,7 +232,7 @@ public class Main {
                 if ((int) msg.charAt(i) < 128) { // 기본 기호일 경우
                     wordCount += 4;
                 } else { // 한글 등 가로 길이가 긴 경우
-                    wordCount += 7;
+                    wordCount += 8;
                 }
             }
 
@@ -276,7 +276,7 @@ public class Main {
                     break;
             }
 
-            if (wordCount >= 120) {
+            if (wordCount >= 160) {
                 if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') { // 마지막 줄이 아닐 경우에만 줄바꿈
                     htmlText.append("<br>");
                 }
