@@ -63,7 +63,7 @@ public class Main {
         }
 
         if (saveFile.exists()) { // 파일이 존재할 경우 (사용 기록이 있어 닉네임이 이미 존재함)
-            try { // 파일에서 원래 닉네임 읽어오기
+            try { // 파일에서 원래 아이디 및 닉네임 읽어오기
                 BufferedReader nameReader = new BufferedReader(new FileReader(saveFile));
                 userID = Integer.parseInt(nameReader.readLine());
                 userName = nameReader.readLine();
