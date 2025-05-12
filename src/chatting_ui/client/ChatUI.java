@@ -27,9 +27,9 @@ public class ChatUI extends JFrame {
     Image buttonTheme = new ImageIcon("resources/buttonTheme.png").getImage();
     ImageIcon exitIcon = new ImageIcon(new ImageIcon("resources/exitIcon.png").getImage()
             .getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-    ImageIcon viewUserIcon = new ImageIcon(new ImageIcon("resources/usersButton.png").getImage()
+    ImageIcon viewUserIcon = new ImageIcon(new ImageIcon("resources/viewUserButton.png").getImage()
             .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
-    ImageIcon chatIcon = new ImageIcon(new ImageIcon("resources/chattingButton.png").getImage()
+    ImageIcon chatIcon = new ImageIcon(new ImageIcon("resources/chatButton.png").getImage()
             .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
 
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
