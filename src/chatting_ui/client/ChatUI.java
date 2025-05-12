@@ -11,21 +11,23 @@ import javax.swing.*;
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방"); // 방 이름 라벨
-    JButton sendBt = new JButton(); // 전송버튼
-    JButton exitBt = new JButton("나가기"); // 나가기 버튼
+    JButton sendBt; // 전송버튼
+    JButton exitBt; // 나가기 버튼
 
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
     JScrollPane scroll = new JScrollPane(msgPanel); // 메시지창을 넣은 스크롤페인
     JTextArea textInput = new JTextArea(); // 메시지 입력 칸
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
-    JButton membersBt = new JButton(); // 유저 목록 보기/채팅창 돌아가기 버튼
+    JButton membersBt; // 유저 목록 보기/채팅창 돌아가기 버튼
     JPanel membersPanel = new JPanel(); // 유저 목록 띄우는 창
     JScrollPane memScroll = new JScrollPane(membersPanel); // 유저목록 창을 넣은 스크롤페인
-    JButton nickChangeBt = new JButton(); // 닉변버튼
+    JButton nickChangeBt = new JButton("이름 변경"); // 닉변버튼
 
     Image buttonTheme = new ImageIcon("resources/buttonTheme.png").getImage();
-    Image grayTheme = new ImageIcon("resource/buttonTheme_gray.png").getImage();
+    Image buttonColorYellow = new ImageIcon("resources/yellowButton.png").getImage();
+    Image exitImage = new ImageIcon("resources/exitIcon.png").getImage()
+            .getScaledInstance(20, 20, Image.SCALE_SMOOTH);
 
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
 
@@ -45,27 +47,33 @@ public class ChatUI extends JFrame {
 
         Container pane = getContentPane();
         pane.setLayout(null);
+        pane.setBackground(new Color(211, 216, 242));
 
         roomName.setFont(new Font("Sans Serif", Font.BOLD, 15));
         roomName.setHorizontalAlignment(JLabel.CENTER);
         roomName.setBounds(92, 5, 200, 40);
         pane.add(roomName);
 
+        exitBt = new JButton("나가기", new ImageIcon(exitImage));
+        exitBt.setHorizontalTextPosition(SwingConstants.RIGHT);
+        exitBt.setVerticalTextPosition(SwingConstants.CENTER);
+        exitBt.setBorderPainted(false);
+        exitBt.setContentAreaFilled(false);
+        exitBt.setOpaque(false);
+        exitBt.setFocusPainted(false);
+
         exitBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
-        exitBt.setBounds(10, 5, 70, 40);
+        exitBt.setBounds(0, 5, 100, 40);
         exitBt.addActionListener(new ActionListener() { // 나가기 버튼 누르면 바로 종료, 서버와 연결 끊어짐
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
-        exitBt.setBorderPainted(false);
-        exitBt.setContentAreaFilled(false);
-        exitBt.setOpaque(false);
         pane.add(exitBt);
 
         membersBt = new JButton("참여자") {
-            private Image bg = buttonTheme.getScaledInstance(70, 40, Image.SCALE_SMOOTH);
+            private Image bg = buttonColorYellow.getScaledInstance(70, 40, Image.SCALE_SMOOTH);
             private ImageIcon icon = new ImageIcon(bg);
 
             @Override
@@ -94,28 +102,14 @@ public class ChatUI extends JFrame {
         membersPanel.setBackground(Color.LIGHT_GRAY);
         membersPanel.setLayout(null);
 
-        memScroll.setBounds(10, 50, 368, 435);
+        memScroll.setBounds(10, 50, 364, 435);
         memScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         memScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         pane.add(memScroll);
         memScroll.setVisible(false);
 
-        nickChangeBt = new JButton("이름 변경") {
-            private Image bg = grayTheme.getScaledInstance(80, 30, Image.SCALE_SMOOTH);
-            private ImageIcon icon = new ImageIcon(bg);
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.setBorderPainted(false);
-                super.setContentAreaFilled(false);
-                super.setOpaque(false);
-
-                bg = icon.getImage();
-                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
-                super.paintComponent(g); // 기본 그리기
-            }
-        };
-
+        nickChangeBt.setContentAreaFilled(false);
+        nickChangeBt.setOpaque(true);
         nickChangeBt.setFont(new Font("Sans Serif", Font.BOLD, 10));
         nickChangeBt.setBounds(260, 15, 80, 30);
         nickChangeBt.addActionListener(new ActionListener() { // 닉변 버튼 누르면 change에 해당하는 함수 실행
@@ -125,10 +119,11 @@ public class ChatUI extends JFrame {
             }
         });
 
+        msgPanel.setBackground(new Color(250, 250, 250));
         msgPanel.setBounds(0, 0, 350, 435);
         msgPanel.setLayout(null);
 
-        scroll.setBounds(10, 50, 368, 435);
+        scroll.setBounds(10, 50, 364, 435);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         pane.add(scroll);
 
@@ -136,6 +131,7 @@ public class ChatUI extends JFrame {
         textInput.setBounds(0, 0, 290, 50);
         textInput.setLineWrap(true);
         textInput.requestFocus();
+        textInput.setBackground(new Color(250, 250, 250));
         textInput.addKeyListener(new PressEnter()); // 텍스트창에서 shift 또는 enter 키를 누를 시 작동함
 
         textScroll.setBounds(10, 500, 290, 50);
