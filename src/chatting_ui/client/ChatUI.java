@@ -11,7 +11,7 @@ import javax.swing.*;
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방"); // 방 이름 라벨
-    JButton sendBt; // 전송버튼
+    JButton sendBt = new JButton(); // 전송버튼
     JButton exitBt = new JButton("나가기"); // 나가기 버튼
 
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
@@ -19,10 +19,13 @@ public class ChatUI extends JFrame {
     JTextArea textInput = new JTextArea(); // 메시지 입력 칸
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
-    JButton membersBt = new JButton("참여자"); // 유저 목록 보기/채팅창 돌아가기 버튼
+    JButton membersBt = new JButton(); // 유저 목록 보기/채팅창 돌아가기 버튼
     JPanel membersPanel = new JPanel(); // 유저 목록 띄우는 창
     JScrollPane memScroll = new JScrollPane(membersPanel); // 유저목록 창을 넣은 스크롤페인
-    JButton nickChangeBt = new JButton("이름 변경"); // 닉변버튼
+    JButton nickChangeBt = new JButton(); // 닉변버튼
+
+    Image buttonTheme = new ImageIcon("resources/buttonTheme.png").getImage();
+    Image grayTheme = new ImageIcon("resource/buttonTheme_gray.png").getImage();
 
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
 
@@ -56,7 +59,26 @@ public class ChatUI extends JFrame {
                 System.exit(0);
             }
         });
+        exitBt.setBorderPainted(false);
+        exitBt.setContentAreaFilled(false);
+        exitBt.setOpaque(false);
         pane.add(exitBt);
+
+        membersBt = new JButton("참여자") {
+            private Image bg = buttonTheme.getScaledInstance(70, 40, Image.SCALE_SMOOTH);
+            private ImageIcon icon = new ImageIcon(bg);
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.setBorderPainted(false);
+                super.setContentAreaFilled(false);
+                super.setOpaque(false);
+
+                bg = icon.getImage();
+                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
+                super.paintComponent(g); // 기본 그리기
+            }
+        };
 
         membersBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
         membersBt.setBounds(307, 5, 70, 40);
@@ -77,6 +99,22 @@ public class ChatUI extends JFrame {
         memScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         pane.add(memScroll);
         memScroll.setVisible(false);
+
+        nickChangeBt = new JButton("이름 변경") {
+            private Image bg = grayTheme.getScaledInstance(80, 30, Image.SCALE_SMOOTH);
+            private ImageIcon icon = new ImageIcon(bg);
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.setBorderPainted(false);
+                super.setContentAreaFilled(false);
+                super.setOpaque(false);
+
+                bg = icon.getImage();
+                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
+                super.paintComponent(g); // 기본 그리기
+            }
+        };
 
         nickChangeBt.setFont(new Font("Sans Serif", Font.BOLD, 10));
         nickChangeBt.setBounds(260, 15, 80, 30);
@@ -105,13 +143,17 @@ public class ChatUI extends JFrame {
         textScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pane.add(textScroll);
 
-        // 버튼에 배경으로 그림 넣기
         sendBt = new JButton("전송") {
-            private Image bg = new ImageIcon("resources/sendbt.png").getImage();
-            // image 객체로 변환
+            private Image bg = buttonTheme.getScaledInstance(70, 50, Image.SCALE_SMOOTH);
+            private ImageIcon icon = new ImageIcon(bg);
 
             @Override
             protected void paintComponent(Graphics g) {
+                super.setBorderPainted(false);
+                super.setContentAreaFilled(false);
+                super.setOpaque(false);
+
+                bg = icon.getImage();
                 g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
                 super.paintComponent(g); // 기본 그리기
             }
@@ -125,9 +167,6 @@ public class ChatUI extends JFrame {
                 sync.start("send");
             }
         });
-        sendBt.setBorderPainted(false);
-        sendBt.setContentAreaFilled(false);
-        sendBt.setOpaque(false);
         pane.add(sendBt);
 
         setVisible(true);
