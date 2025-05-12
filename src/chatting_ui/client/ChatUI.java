@@ -11,7 +11,7 @@ import javax.swing.*;
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
     JLabel roomName = new JLabel("새로운 채팅방"); // 방 이름 라벨
-    JButton sendBt = new JButton("전송"); // 전송버튼
+    JButton sendBt; // 전송버튼
     JButton exitBt = new JButton("나가기"); // 나가기 버튼
 
     JPanel msgPanel = new JPanel(); // 메시지 표시 창
@@ -105,6 +105,18 @@ public class ChatUI extends JFrame {
         textScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pane.add(textScroll);
 
+        // 버튼에 배경으로 그림 넣기
+        sendBt = new JButton("전송") {
+            private Image bg = new ImageIcon("resources/sendbt.png").getImage();
+            // image 객체로 변환
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
+                super.paintComponent(g); // 기본 그리기
+            }
+        };
+
         sendBt.setFont(new Font("Sans Serif", Font.BOLD, 15));
         sendBt.setBounds(307, 500, 70, 50);
         sendBt.addActionListener(new ActionListener() { // 전송버튼 누를시 send에 해당하는 함수 호출
@@ -113,6 +125,8 @@ public class ChatUI extends JFrame {
                 sync.start("send");
             }
         });
+        sendBt.setContentAreaFilled(false);
+        sendBt.setOpaque(false);
         pane.add(sendBt);
 
         setVisible(true);
