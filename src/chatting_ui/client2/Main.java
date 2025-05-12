@@ -239,7 +239,7 @@ public class Main {
                     break;
             }
 
-            if (wordCount >= 160) {
+            if (wordCount >= 140) {
                 if (i < msg.length() - 1 && msg.charAt(i + 1) != '\n') {
                     htmlText.append("<br>");
                 }
