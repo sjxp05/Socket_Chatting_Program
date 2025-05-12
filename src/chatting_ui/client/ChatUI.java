@@ -125,6 +125,7 @@ public class ChatUI extends JFrame {
                 sync.start("send");
             }
         });
+        sendBt.setBorderPainted(false);
         sendBt.setContentAreaFilled(false);
         sendBt.setOpaque(false);
         pane.add(sendBt);
