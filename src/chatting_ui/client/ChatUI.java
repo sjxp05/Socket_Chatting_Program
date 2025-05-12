@@ -19,15 +19,18 @@ public class ChatUI extends JFrame {
     JTextArea textInput = new JTextArea(); // 메시지 입력 칸
     JScrollPane textScroll = new JScrollPane(textInput); // 메시지 입력 칸을 넣은 스크롤페인
 
-    JButton membersBt; // 유저 목록 보기/채팅창 돌아가기 버튼
+    JButton membersBt = new JButton(); // 유저 목록 보기/채팅창 돌아가기 버튼
     JPanel membersPanel = new JPanel(); // 유저 목록 띄우는 창
     JScrollPane memScroll = new JScrollPane(membersPanel); // 유저목록 창을 넣은 스크롤페인
     JButton nickChangeBt = new JButton("이름 변경"); // 닉변버튼
 
     Image buttonTheme = new ImageIcon("resources/buttonTheme.png").getImage();
-    Image buttonColorYellow = new ImageIcon("resources/yellowButton.png").getImage();
-    Image exitImage = new ImageIcon("resources/exitIcon.png").getImage()
-            .getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+    ImageIcon exitIcon = new ImageIcon(new ImageIcon("resources/exitIcon.png").getImage()
+            .getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+    ImageIcon viewUserIcon = new ImageIcon(new ImageIcon("resources/usersButton.png").getImage()
+            .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
+    ImageIcon chatIcon = new ImageIcon(new ImageIcon("resources/chattingButton.png").getImage()
+            .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
 
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
 
@@ -54,7 +57,7 @@ public class ChatUI extends JFrame {
         roomName.setBounds(92, 5, 200, 40);
         pane.add(roomName);
 
-        exitBt = new JButton("나가기", new ImageIcon(exitImage));
+        exitBt = new JButton("나가기", exitIcon);
         exitBt.setHorizontalTextPosition(SwingConstants.RIGHT);
         exitBt.setVerticalTextPosition(SwingConstants.CENTER);
         exitBt.setBorderPainted(false);
@@ -63,7 +66,7 @@ public class ChatUI extends JFrame {
         exitBt.setFocusPainted(false);
 
         exitBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
-        exitBt.setBounds(0, 5, 100, 40);
+        exitBt.setBounds(-10, 5, 100, 40);
         exitBt.addActionListener(new ActionListener() { // 나가기 버튼 누르면 바로 종료, 서버와 연결 끊어짐
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -72,24 +75,13 @@ public class ChatUI extends JFrame {
         });
         pane.add(exitBt);
 
-        membersBt = new JButton("참여자") {
-            private Image bg = buttonColorYellow.getScaledInstance(70, 40, Image.SCALE_SMOOTH);
-            private ImageIcon icon = new ImageIcon(bg);
-
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.setBorderPainted(false);
-                super.setContentAreaFilled(false);
-                super.setOpaque(false);
-
-                bg = icon.getImage();
-                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
-                super.paintComponent(g); // 기본 그리기
-            }
-        };
+        membersBt.setIcon(viewUserIcon);
+        membersBt.setBorderPainted(false);
+        membersBt.setContentAreaFilled(false);
+        membersBt.setOpaque(false);
 
         membersBt.setFont(new Font("Sans Serif", Font.BOLD, 12));
-        membersBt.setBounds(307, 5, 70, 40);
+        membersBt.setBounds(332, 5, 40, 40);
         membersBt.addActionListener(new ActionListener() { // 참여자 보기 버튼 누르면 view에 해당하는 함수 실행
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,7 +91,7 @@ public class ChatUI extends JFrame {
         pane.add(membersBt);
 
         membersPanel.setBounds(0, 0, 400, 435);
-        membersPanel.setBackground(Color.LIGHT_GRAY);
+        membersPanel.setBackground(new Color(152, 161, 207));
         membersPanel.setLayout(null);
 
         memScroll.setBounds(10, 50, 364, 435);
@@ -252,14 +244,14 @@ public class ChatUI extends JFrame {
     void viewMembers() {
         if (viewMode) { // 이미 표시되어 있을 때 끄기
             viewMode = false;
-            membersBt.setText("참여자");
+            membersBt.setIcon(viewUserIcon);
             membersPanel.removeAll(); // 패널 안의 모든 요소 지우기
             memScroll.setVisible(false);
             return;
 
         } else { // 표시 안된 상태일 때 표시하기
             viewMode = true;
-            membersBt.setText("채팅");
+            membersBt.setIcon(chatIcon);
             Main.viewRequest(); // Main클래스의 static 메소드 호출로 서버에 목록 전송 요청
 
             int nextMemberLocation = 10; // 패널 안에서 다음 라벨이 올 위치
