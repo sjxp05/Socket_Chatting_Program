@@ -24,13 +24,13 @@ public class ChatUI extends JFrame {
     JScrollPane memScroll = new JScrollPane(membersPanel); // 유저목록 창을 넣은 스크롤페인
     JButton nickChangeBt = new JButton("이름 변경"); // 닉변버튼
 
-    Image buttonTheme = new ImageIcon("resources/buttonTheme.png").getImage();
-    ImageIcon exitIcon = new ImageIcon(new ImageIcon("resources/exitIcon.png").getImage()
-            .getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-    ImageIcon viewUserIcon = new ImageIcon(new ImageIcon("resources/viewUserButton.png").getImage()
-            .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
-    ImageIcon chatIcon = new ImageIcon(new ImageIcon("resources/chatButton.png").getImage()
-            .getScaledInstance(40, 40, Image.SCALE_SMOOTH));
+    Image buttonTheme = new ImageIcon(getClass().getResource("resources/buttonTheme.png")).getImage();
+    ImageIcon exitIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/exitIcon.png"))
+            .getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+    ImageIcon viewUserIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/viewUserButton.png"))
+            .getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH));
+    ImageIcon chatIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/chatButton.png"))
+            .getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH));
 
     private SyncOnUpdate sync = new SyncOnUpdate(); // 버튼 누를 때 동기화해주는 Runnable 객체
 
