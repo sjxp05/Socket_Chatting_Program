@@ -116,6 +116,7 @@ public class ChatUI extends JFrame {
         msgPanel.setLayout(null);
 
         scroll.setBounds(10, 50, 364, 435);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         pane.add(scroll);
 
