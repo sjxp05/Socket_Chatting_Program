@@ -10,7 +10,7 @@ import javax.swing.*;
 
 // UI 표시/변경만 담당하는 클래스
 public class ChatUI extends JFrame {
-    JLabel roomName = new JLabel("새로운 채팅방"); // 방 이름 라벨
+    JLabel roomName = new JLabel("지인들의 단톡방"); // 방 이름 라벨
     JButton sendBt; // 전송버튼
     JButton exitBt; // 나가기 버튼
 
@@ -42,7 +42,7 @@ public class ChatUI extends JFrame {
      */
 
     ChatUI() {
-        setTitle("New Chat");
+        setTitle("CS Girls' Talk");
         setSize(400, 600);
         setResizable(false);
         setLocationRelativeTo(null); // 화면 가운데에 띄우기
